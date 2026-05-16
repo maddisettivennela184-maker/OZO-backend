@@ -1,0 +1,355 @@
+POST http://localhost:3001/api/register
+Content-Type: application/json
+
+{
+  "name": "Admin",
+  "email": "admin@gmail.com",
+  "password": "admin@123",
+  "role": "ADMIN",
+  "permissions": [
+    "ADD_PRODUCT",
+    "DELETE_PRODUCT"
+  ]
+}
+
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "admin123"
+}
+
+###
+POST http://localhost:3001/api/forgot-password
+Content-Type: application/json
+
+{
+  "email":"admin@gmail.com"
+}
+
+###
+POST http://localhost:3001/api/reset-password
+Content-Type: application/json
+
+{
+  "token": "df5f776a6816381d8690219464058cf82d96faf187636cdb73e9f6e0914986f3",
+  "password": "admin123"
+}
+
+###
+POST http://localhost:3001/api/gold-rate
+Content-Type: application/json
+
+{
+  "ratePerGram": 5000,
+  "updatedBy": "69f067f6ac6f3e806161afbe"
+}
+
+
+
+
+###
+GET http://localhost:3001/api/gold-rate
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/gold-rate/69f0f219d271df42b36bf134
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/gold-rate/69f0f219d271df42b36bf134
+Content-Type: application/json
+
+{
+  "ratePerGram": 1000,
+  "updatedBy": "69f067f6ac6f3e806161afbe"
+}
+
+###
+DELETE http://localhost:3001/api/gold-rate/69f0ef51d271df42b36bf108
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-category
+
+###
+GET http://localhost:3001/api/getallcategory
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getbyIdcategory/69f10a44326d005b487c377f
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/updatecategory/69f35b350d4a40e6da874184
+
+###
+DELETE http://localhost:3001/api/deletecategory/69f19a810ece6ef90232bfac
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/Cretesubcategory
+
+###
+GET http://localhost:3001/api/Getsubcategory
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getbyIdsubcategory/69f1a824e5fe4098377801fc
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/Updatesubcategory/69f1a9c0a16e7054a7af4433
+
+###
+DELETE http://localhost:3001/api/Deletesubcategory/69f1a824e5fe4098377801fc
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/Create-sub-subcategory
+
+###
+GET http://localhost:3001/api/get-subsubcategory
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getById-subsubcategory/69f22467b2be77cfc57d2c87
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/Update_subsubcategory/69f22467b2be77cfc57d2c87
+
+###
+DELETE http://localhost:3001/api/subsubcategory/69f224b8b2be77cfc57d2c89
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-product
+
+###
+GET http://localhost:3001/api/getAllProducts
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-product/6a033a151d9cd834dbc9c09a
+Content-Type: application/json 
+
+###
+PUT http://localhost:3001/api/update-product/6a033a151d9cd834dbc9c09a
+
+###
+DELETE http://localhost:3001/api/Deleteproduct/6a017c6060862d1699e6cb2f
+Content-Type: application/json
+
+
+
+###
+POST http://localhost:3001/api/Userregister
+Content-Type: application/json
+
+{
+  "name": "AnilKumar",
+  "email": "nani0607@gmail.com",
+  "password": "nani@111",
+  "phone": "8978971154"
+}
+
+###
+POST http://localhost:3001/api/userLogin
+Content-Type: application/json
+
+{
+  "phone": "8978971154",
+  "password": "nani@111"
+}
+
+# forgotpassword
+
+###
+POST http://localhost:3001/api/user-forgot-password
+Content-Type: application/json
+
+{
+  "email": "maddisettivennela184@gmail.com"
+}
+
+###
+POST http://localhost:3001/api/verify-otp
+Content-Type: application/json
+
+{
+  "email": "maddisettivennela184@gmail.com",
+  "otp": "934145"
+}
+
+###
+POST http://localhost:3001/api/resend-otp
+Content-Type: application/json
+
+{
+  "email": "maddisettivennela184@gmail.com"
+}
+
+###
+POST http://localhost:3001/api/user-reset-password
+Content-Type: application/json
+
+{
+  "email": "maddisettivennela184@gmail.com",
+  "newPassword": "newvenni"
+}
+
+
+
+
+###
+POST http://localhost:3001/api/addcart
+Content-Type: application/json
+
+{
+  "user": "69f4455430a4633b9cd12af6",
+  "product": "69f39ba893ece02cc479aa71",
+  "variantId": "69f39ba893ece02cc479aa72",
+  "quantity": 1
+}
+
+###
+GET http://localhost:3001/api/getcart/69f4455430a4633b9cd12af6
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/cart/69f4fda00498cf0ca64fdbc0/item/69f4fda00498cf0ca64fdbc1
+Content-Type: application/json
+
+{
+  "quantity": 2
+}
+
+###
+DELETE http://localhost:3001/api/cart/69f4fda00498cf0ca64fdbc0/item/69f5022b0c4a8e5d2cbab15e
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/wishlist
+Content-Type: application/json
+
+{
+  "user": "69f58caa79f51a9e18332449",
+  "product": "69f39bc793ece02cc479aa75",
+  "variantId": "69f39cd593ece02cc479aa87"
+}
+
+###
+GET http://localhost:3001/api/wishlist/69f4455430a4633b9cd12af6
+Content-Type: application/json
+
+###
+DELETE http://localhost:3001/api/wishlist/69f510968be4dfb0e09d5609/item/69f510968be4dfb0e09d560a
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/Createaddress
+Content-Type: application/json
+
+{
+  "user": "69f6435c46e9fd840f071f61",
+  "fullName": " nani",
+  "phone": "9391551159",
+  "addressLine1": "House No 12",
+  "addressLine2": "Ramalayam Temple",
+  "city": "Bhimavaram",
+  "state": "Andhra Pradesh",
+  "pincode": "534239",
+  "country": "India",
+  "isDefault": true
+}
+
+###
+GET http://localhost:3001/api/address/69f6435c46e9fd840f071f61
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/updateaddress/69f51b79b0b4c1762439d775
+Content-Type: application/json
+
+{
+  "fullName": "Vennela New",
+  "phone": "9391551158",
+  "addressLine1": "Flat No 101",
+  "addressLine2": "Near Bus Stand",
+  "city": "Hyderabad",
+  "state": "Telangana",
+  "pincode": "500001",
+  "country": "India",
+  "isDefault": true
+}
+
+###
+DELETE http://localhost:3001/api/Deleteaddress/69f51b79b0b4c1762439d775
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getAllAddress
+Content-Type: application/json
+
+
+###
+POST  http://localhost:3001/api/createBanner
+
+###
+PUT   http://localhost:3001/api/updateBanner/69feb451d2d8e959478a5b61
+
+###
+GET http://localhost:3001/api/getAllBanners
+Content-Type: application/json
+
+###
+DELETE http://localhost:3001/api/deleteBanner/69feae21fef726716d6216a2
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getAllUsers
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getUsersCount
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-subsubcategorybysubcategory/69ffdc0701f16f5297e6df51
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-subcategoryby-category/69f10a44326d005b487c377f
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-contact
+Content-Type: application/json
+
+{
+  "name": "Vennela",
+  "email": "vennela@gmail.com",
+  "phone": "9876543210",
+  "subject": "Diamond Ring",
+  "message": "Need diamond ring details"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -23,7 +23,7 @@ const upload =require("../Middleware/upload");
 const {
   uploadCertificate
 } = require(
-  "../controllers/uploadController"
+  "../Controllers/uploadController"
 );
 
 

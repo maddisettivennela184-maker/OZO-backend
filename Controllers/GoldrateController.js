@@ -1,4 +1,4 @@
-const GoldRate = require("../Models/GoldRate");
+const GoldRate = require("../Models/Goldrate");
 
 
 /*

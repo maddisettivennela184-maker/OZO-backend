@@ -4,7 +4,6 @@ const Product =
 const cloudinary =
   require("../cloudinaryconfig");
   const GoldRate =
-  require("../Models/GoldRate");
 
 
   /*

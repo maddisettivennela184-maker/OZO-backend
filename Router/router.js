@@ -5,20 +5,20 @@ const router= express.Router();
 
 
 
-const {register,login,forgotPassword,resetPassword} = require('../controllers/UserController');
-const {createGoldRate,getAllGoldRates,getGoldRateById,updateGoldRate,deleteGoldRate} = require("../controllers/goldRateController");
-const {createCategory, getAllCategories,getCategoryById,updateCategory,deleteCategory} = require("../controllers/categoryController");
-const {getSubCategoryByCategory,createSubCategory,getAllSubCategories,getSubCategoryById,updateSubCategory,deleteSubCategory} = require("../controllers/subCategoryController");
-const {getSubSubCategoryBySubCategory,createSubSubCategory,getAllSubSubCategories,getSubSubCategoryById,updateSubSubCategory,deleteSubSubCategory} = require("../controllers/subSubCategoryController");
-const {createProduct,getAllProducts ,getProductById,updateProduct,deleteProduct} = require("../controllers/productController");
-const {getAllUsers,getUsersCount,Userregister ,userLogin,userforgotPassword,verifyOTP,resendOTP,userresetPassword} = require("../controllers/UserLoginController");
-const {addToCart,getCart,updateCartItem,removeCartItem,clearCart} = require("../controllers/cartController");
-const {addToWishlist,getWishlist,removeWishlistItem} = require("../controllers/wishlistController");
-const {createAddress,getAddresses,updateAddress,deleteAddress,getAllAddresses} = require("../controllers/addressController");
-const {createBanner,updateBanner,getAllBanners,deleteBanner} = require("../controllers/bannerController");
-const {createContact,getAllContacts,getContactById,updateContact,deleteContact} = require("../controllers/contactController");
+const {register,login,forgotPassword,resetPassword} = require('../Controllers/UserController');
+const {createGoldRate,getAllGoldRates,getGoldRateById,updateGoldRate,deleteGoldRate} = require("../Controllers/goldRateController");
+const {createCategory, getAllCategories,getCategoryById,updateCategory,deleteCategory} = require("../Controllers/categoryController");
+const {getSubCategoryByCategory,createSubCategory,getAllSubCategories,getSubCategoryById,updateSubCategory,deleteSubCategory} = require("../Controllers/subCategoryController");
+const {getSubSubCategoryBySubCategory,createSubSubCategory,getAllSubSubCategories,getSubSubCategoryById,updateSubSubCategory,deleteSubSubCategory} = require("../Controllers/subSubCategoryController");
+const {createProduct,getAllProducts ,getProductById,updateProduct,deleteProduct} = require("../Controllers/productController");
+const {getAllUsers,getUsersCount,Userregister ,userLogin,userforgotPassword,verifyOTP,resendOTP,userresetPassword} = require("../Controllers/UserLoginController");
+const {addToCart,getCart,updateCartItem,removeCartItem,clearCart} = require("../Controllers/cartController");
+const {addToWishlist,getWishlist,removeWishlistItem} = require("../Controllers/wishlistController");
+const {createAddress,getAddresses,updateAddress,deleteAddress,getAllAddresses} = require("../Controllers/addressController");
+const {createBanner,updateBanner,getAllBanners,deleteBanner} = require("../Controllers/bannerController");
+const {createContact,getAllContacts,getContactById,updateContact,deleteContact} = require("../Controllers/contactController");
 
-const upload =require("../middleware/upload");
+const upload =require("../Middleware/upload");
 
 const {
   uploadCertificate

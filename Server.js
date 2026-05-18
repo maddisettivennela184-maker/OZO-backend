@@ -31,4 +31,12 @@ app.get('/',(req,res)=>{
  const PORT = process.env.PORT || 3001;
   server.listen(PORT,()=>{
      console.log(`server running at http://localhost:${PORT}`);
-  })
+  });
+
+  process.on("uncaughtException", (err) => {
+  console.log("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.log("Unhandled Rejection:", err);
+});

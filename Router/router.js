@@ -6,17 +6,17 @@ const router= express.Router();
 
 
 const {register,login,forgotPassword,resetPassword} = require('../Controllers/UserController');
-const {createGoldRate,getAllGoldRates,getGoldRateById,updateGoldRate,deleteGoldRate} = require("../Controllers/goldRateController");
-const {createCategory, getAllCategories,getCategoryById,updateCategory,deleteCategory} = require("../Controllers/categoryController");
+const {createGoldRate,getAllGoldRates,getGoldRateById,updateGoldRate,deleteGoldRate} = require("../Controllers/GoldrateController");
+const {createCategory, getAllCategories,getCategoryById,updateCategory,deleteCategory} = require("../Controllers/CategoryController");
 const {getSubCategoryByCategory,createSubCategory,getAllSubCategories,getSubCategoryById,updateSubCategory,deleteSubCategory} = require("../Controllers/subCategoryController");
 const {getSubSubCategoryBySubCategory,createSubSubCategory,getAllSubSubCategories,getSubSubCategoryById,updateSubSubCategory,deleteSubSubCategory} = require("../Controllers/subSubCategoryController");
 const {createProduct,getAllProducts ,getProductById,updateProduct,deleteProduct} = require("../Controllers/productController");
 const {getAllUsers,getUsersCount,Userregister ,userLogin,userforgotPassword,verifyOTP,resendOTP,userresetPassword} = require("../Controllers/UserLoginController");
-const {addToCart,getCart,updateCartItem,removeCartItem,clearCart} = require("../Controllers/cartController");
+const {addToCart,getCart,updateCartItem,removeCartItem,clearCart} = require("../Controllers/CartController");
 const {addToWishlist,getWishlist,removeWishlistItem} = require("../Controllers/wishlistController");
 const {createAddress,getAddresses,updateAddress,deleteAddress,getAllAddresses} = require("../Controllers/addressController");
 const {createBanner,updateBanner,getAllBanners,deleteBanner} = require("../Controllers/bannerController");
-const {createContact,getAllContacts,getContactById,updateContact,deleteContact} = require("../Controllers/contactController");
+const {createContact,getAllContacts,getContactById,updateContact,deleteContact} = require("../Controllers/ContactController");
 
 const upload =require("../Middleware/upload");
 

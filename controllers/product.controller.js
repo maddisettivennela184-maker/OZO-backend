@@ -481,16 +481,16 @@ exports.getAllProducts =
       // =========================
       // LATEST GOLD RATE
       // =========================
-
+console.log("GoldRate =", GoldRate);
+console.log("modelName =", GoldRate?.modelName);
+console.log("findOne =", typeof GoldRate?.findOne);
       const latestGoldRate =
         await GoldRate.findOne()
         .sort({
           createdAt: -1
 
         });
-        console.log("GoldRate:", GoldRate);
-console.log("Type:", typeof GoldRate);
-console.log("FindOne:", GoldRate.findOne);
+       
 
       const ratePerGram =
         latestGoldRate?.ratePerGram || 0;

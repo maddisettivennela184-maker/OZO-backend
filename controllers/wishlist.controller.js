@@ -5,7 +5,7 @@ const Product =
   require("../models/product");
 
   const GoldRate =
-  require("../models/goldRate");
+  require("../models/gold-rate");
 
 
 /*

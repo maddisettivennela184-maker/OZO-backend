@@ -1,4 +1,4 @@
-const GoldRate = require("../Models/GoldRate");
+const GoldRate = require("../models/goldRate");
 
 
 /*
@@ -20,6 +20,7 @@ exports.createGoldRate = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Admin id is required"
+
       });
     }
 

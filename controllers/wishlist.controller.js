@@ -1,11 +1,11 @@
 const Wishlist =
-  require("../Models/Wishlist");
+  require("../models/wishlist");
 
 const Product =
-  require("../Models/Product");
+  require("../models/product");
 
   const GoldRate =
-  require("../Models/GoldRate");
+  require("../models/goldRate");
 
 
 /*

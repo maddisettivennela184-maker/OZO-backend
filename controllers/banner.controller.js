@@ -1,5 +1,5 @@
 const Banner =
-  require("../Models/Banner");
+  require("../models/banner");
 
 const cloudinary =
   require("../cloudinaryconfig");

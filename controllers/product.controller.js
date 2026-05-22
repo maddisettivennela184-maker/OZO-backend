@@ -1,9 +1,9 @@
 const Product =
-  require("../Models/Product");
+  require("../models/product");
 
 const cloudinary =
   require("../cloudinaryconfig");
-  const GoldRate =require("../Models/GoldRate");
+  const GoldRate =require("../models/goldRate");
 
 
   /*

@@ -1,5 +1,5 @@
 const Address =
-  require("../Models/Address");
+  require("../models/address");
   
 
 exports.createAddress =

@@ -1,11 +1,11 @@
-const User = require("../Models/UserLogin");
+const User = require("../models/user-login");
 const bcrypt = require("bcrypt");
 const jwt =require("jsonwebtoken");
 
 const {
   transporter
 } = require(
-  "../Middleware/mail"
+  "../middleware/mail"
 );
 /*
 REGISTER

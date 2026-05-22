@@ -1,5 +1,5 @@
 const Contact =
-require("../Models/contact");
+require("../models/contact");
 
 
 /*

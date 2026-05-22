@@ -1,4 +1,4 @@
-const Category = require("../Models/Category");
+const Category = require("../models/category");
 const cloudinary = require("../cloudinaryconfig");
 
 

@@ -5,7 +5,7 @@ const http= require("http");
 
 const connectDB=require("./db");
 const cors = require("cors");
-const router= require("./Router/router");
+const router= require("./router/router");
 
 
 

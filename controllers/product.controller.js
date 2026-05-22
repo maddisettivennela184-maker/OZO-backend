@@ -5,6 +5,10 @@ const cloudinary =
   require("../cloudinaryconfig");
   const GoldRate =require("../models/gold-rate");
 
+ console.log("GoldRate =", GoldRate);
+console.log("Model Name =", GoldRate?.modelName);
+console.log("FindOne Type =", typeof GoldRate?.findOne);
+
 
   /*
 CREATE PRODUCT

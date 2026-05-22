@@ -1,6 +1,6 @@
 const Cart = require("../Models/Cart");
 const Product = require("../Models/Product");
-const GoldRate = require("../Models/Goldrate");
+const GoldRate = require("../Models/GoldRate");
 
 
 

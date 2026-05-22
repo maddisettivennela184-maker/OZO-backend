@@ -3,7 +3,7 @@ const Product =
 
 const cloudinary =
   require("../cloudinaryconfig");
-  const GoldRate =require("../Models/Goldrate")
+  const GoldRate =require("../Models/GoldRate");
 
 
   /*
@@ -486,7 +486,11 @@ exports.getAllProducts =
         await GoldRate.findOne()
         .sort({
           createdAt: -1
+
         });
+        console.log("GoldRate:", GoldRate);
+console.log("Type:", typeof GoldRate);
+console.log("FindOne:", GoldRate.findOne);
 
       const ratePerGram =
         latestGoldRate?.ratePerGram || 0;

@@ -32,7 +32,4 @@ const goldRateSchema = new mongoose.Schema(
 
 module.exports =
   mongoose.models.GoldRate ||
-  mongoose.model(
-    "GoldRate",
-    goldRateSchema
-  );
+  mongoose.model("GoldRate", goldRateSchema);

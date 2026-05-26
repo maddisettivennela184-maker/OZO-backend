@@ -3,14 +3,12 @@ const Product =
 
 const cloudinary =
   require("../cloudinaryconfig");
-  const GoldRate =require("../models/gold-rate");
+const GoldRate = require("../models/gold-rate");
 
- console.log("GoldRate =", GoldRate);
-console.log("Model Name =", GoldRate?.modelName);
-console.log("FindOne Type =", typeof GoldRate?.findOne);
+const calculateProductPrices = require("../utils/product-price.helper");
 
 
-  /*
+/*
 CREATE PRODUCT
 */
 exports.createProduct = async (req, res) => {
@@ -143,12 +141,12 @@ exports.createProduct = async (req, res) => {
 
         tags:
           req.body.tags
-          ? JSON.parse(req.body.tags)
-          : [],
+            ? JSON.parse(req.body.tags)
+            : [],
 
         images:
           imageUrls,
-          video: videoUrl
+        video: videoUrl
 
 
       });
@@ -371,8 +369,8 @@ exports.updateProduct = async (req, res) => {
 
     let variants =
       req.body.variants
-      ? JSON.parse(req.body.variants)
-      : existingProduct.variants;
+        ? JSON.parse(req.body.variants)
+        : existingProduct.variants;
 
     // =====================================
     // CERTIFICATE URL ADD
@@ -423,8 +421,8 @@ exports.updateProduct = async (req, res) => {
 
           tags:
             req.body.tags
-            ? JSON.parse(req.body.tags)
-            : existingProduct.tags
+              ? JSON.parse(req.body.tags)
+              : existingProduct.tags
 
         },
 
@@ -482,199 +480,50 @@ exports.getAllProducts =
 
     try {
 
-      // =========================
       // LATEST GOLD RATE
-      // =========================
-console.log("GoldRate =", GoldRate);
-console.log("modelName =", GoldRate?.modelName);
-console.log("findOne =", typeof GoldRate?.findOne);
-      const latestGoldRate =
-        await GoldRate.findOne()
-        .sort({
-          createdAt: -1
 
-        });
-       
+      const latestGoldRate =
+
+        await GoldRate.findOne()
+
+          .sort({
+            createdAt: -1
+          });
 
       const ratePerGram =
+
         latestGoldRate?.ratePerGram || 0;
 
-      // =========================
       // GET PRODUCTS
-      // =========================
 
       const products =
+
         await Product.find()
 
-        .populate("category")
+          .populate("category")
 
-        .populate("subCategory")
+          .populate("subCategory")
 
-        .populate("subSubCategory")
+          .populate("subSubCategory")
 
-        .sort({
-          createdAt: -1
-        });
+          .sort({
+            createdAt: -1
+          });
 
-      // =========================
-      // CALCULATE PRODUCTS
-      // =========================
+      // PRICE CALCULATION
 
       const updatedProducts =
-        products.map((product) => {
 
-          const updatedVariants =
+        products.map(product =>
 
-            product.variants.map(
-              (variant) => {
+          calculateProductPrices(
+            product,
+            ratePerGram
+          )
 
-                // =====================
-                // GOLD PRICE
-                // =====================
+        );
 
-                const grossWeight =
-
-                  Number(
-                    variant.grossWeight || 0
-                  );
-
-                const goldCost =
-
-                  grossWeight *
-
-                  ratePerGram;
-
-                // =====================
-                // WASTAGE PRICE
-                // =====================
-
-                const wastagePrice =
-
-                  (
-                    goldCost *
-
-                    Number(
-                      variant.wastagePercentage || 0
-                    )
-
-                  ) / 100;
-
-                // =====================
-                // DIAMOND PRICE
-                // =====================
-
-                let totalDiamondPrice = 0;
-
-                variant.diamonds.forEach(
-                  (diamond) => {
-
-                    totalDiamondPrice +=
-
-                      (
-
-                        Number(
-                          diamond.diamondPrice || 0
-                        )
-
-                      )
-
-                      *
-
-                      (
-
-                        Number(
-                          diamond.totalDiamonds || 1
-                        )
-
-                      );
-
-                  }
-                );
-
-                // =====================
-                // TOTAL PRICE
-                // =====================
-
-                const totalPrice =
-
-                  goldCost +
-
-                  wastagePrice +
-
-                  Number(
-                    variant.makingCharges || 0
-                  ) +
-
-                  totalDiamondPrice;
-
-                // =====================
-                // DISCOUNT AMOUNT
-                // =====================
-
-                const discountAmount =
-
-                  (
-
-                    totalPrice *
-
-                    Number(
-                      variant.discountPercentage || 0
-                    )
-
-                  ) / 100;
-
-                // =====================
-                // FINAL PRICE
-                // =====================
-
-                const finalPrice =
-
-                  totalPrice -
-
-                  discountAmount;
-
-                // =====================
-                // RETURN VARIANT
-                // =====================
-
-                return {
-
-                  ...variant.toObject(),
-
-                  goldRatePerGram:
-                    ratePerGram,
-
-                  goldCost,
-
-                  wastagePrice,
-
-                  totalDiamondPrice,
-
-                  totalPrice,
-
-                  discountAmount,
-
-                  finalPrice
-
-                };
-
-              }
-            );
-
-          return {
-
-            ...product.toObject(),
-
-            variants:
-              updatedVariants
-
-          };
-
-        });
-
-      // =========================
       // RESPONSE
-      // =========================
 
       res.status(200).json({
 
@@ -687,48 +536,152 @@ console.log("findOne =", typeof GoldRate?.findOne);
           updatedProducts
 
       });
-      // =====================================
-// VIDEO UPLOAD
-// =====================================
 
-if (
-  req.files?.video?.length > 0
-) {
+    } catch (error) {
 
-  const videoFile =
-    req.files.video[0];
+      res.status(500).json({
 
-  const videoResult =
-    await new Promise(
-      (resolve, reject) => {
+        success: false,
 
-        cloudinary.uploader.upload_stream(
+        message:
+          error.message
 
-          {
-            folder: "videos",
+      });
 
-            resource_type: "video"
-          },
+    }
 
-          (error, result) => {
+  };
 
-            if (error)
-              reject(error);
+exports.getAllProductsWithPagination =
+  async (req, res) => {
 
-            else
-              resolve(result);
+    try {
 
-          }
+      // =========================
+      // QUERY PARAMS
+      // =========================
 
-        ).end(videoFile.buffer);
+      const page =
+        Number(req.query.page) || 1;
 
-      }
-    );
+      const limit =
+        Number(req.query.limit) || 10;
 
-  videoUrl =
-    videoResult.secure_url;
+      const search =
+        req.query.search || "";
 
-}
+      const skip =
+        (page - 1) * limit;
+
+      // =========================
+      // SEARCH FILTER
+      // =========================
+
+      const searchFilter = {
+
+        name: {
+          $regex: search,
+          $options: "i"
+        }
+
+      };
+
+      // =========================
+      // LATEST GOLD RATE
+      // =========================
+
+      const latestGoldRate =
+        await GoldRate.findOne()
+          .sort({
+            createdAt: -1
+          });
+
+      const ratePerGram =
+        latestGoldRate?.ratePerGram || 0;
+
+      // =========================
+      // TOTAL COUNT
+      // =========================
+
+      const totalProducts =
+
+        await Product.countDocuments(
+
+          search
+            ? searchFilter
+            : {}
+
+        );
+
+      // =========================
+      // GET PRODUCTS
+      // =========================
+
+      const products =
+
+        await Product.find(
+
+          search
+            ? searchFilter
+            : {}
+
+        )
+
+          .populate("category")
+
+          .populate("subCategory")
+
+          .populate("subSubCategory")
+
+          .sort({
+            createdAt: -1
+          })
+
+          .skip(skip)
+
+          .limit(limit);
+
+      // =========================
+      // USE HELPER
+      // =========================
+
+      const updatedProducts =
+
+        products.map(product =>
+
+          calculateProductPrices(
+            product,
+            ratePerGram
+          )
+
+        );
+
+      // =========================
+      // RESPONSE
+      // =========================
+
+      res.status(200).json({
+
+        success: true,
+
+        currentPage:
+          page,
+
+        totalPages:
+
+          Math.ceil(
+            totalProducts / limit
+          ),
+
+        totalProducts,
+
+        count:
+          updatedProducts.length,
+
+        data:
+          updatedProducts
+
+      });
 
     } catch (error) {
 
@@ -745,58 +698,58 @@ if (
 
     }
 
-};
+  };
 
 /*
 DELETE PRODUCT
 */
 exports.deleteProduct =
-async (req, res) => {
+  async (req, res) => {
 
-  try {
+    try {
 
-    const product =
-      await Product.findByIdAndDelete(
-        req.params.id
-      );
+      const product =
+        await Product.findByIdAndDelete(
+          req.params.id
+        );
 
-    if (!product) {
+      if (!product) {
 
-      return res.status(404)
-      .json({
+        return res.status(404)
+          .json({
+
+            success: false,
+
+            message:
+              "Product not found"
+
+          });
+
+      }
+
+      res.status(200).json({
+
+        success: true,
+
+        message:
+          "Product deleted successfully"
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
 
         success: false,
 
         message:
-          "Product not found"
+          error.message
 
       });
 
     }
 
-    res.status(200).json({
-
-      success: true,
-
-      message:
-        "Product deleted successfully"
-
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-
-      success: false,
-
-      message:
-        error.message
-
-    });
-
-  }
-
-};
+  };
 
 /*
 GET PRODUCT BY ID
@@ -804,7 +757,6 @@ GET PRODUCT BY ID
 // =====================================
 // GET SINGLE PRODUCT BY ID
 // =====================================
-
 exports.getProductById = async (
   req,
   res
@@ -812,15 +764,14 @@ exports.getProductById = async (
 
   try {
 
-    const {
-      id
-    } = req.params;
+    const { id } = req.params;
 
     // =====================================
     // FIND PRODUCT
     // =====================================
 
     const product =
+
       await Product.findById(id)
 
         .populate(
@@ -856,6 +807,36 @@ exports.getProductById = async (
     }
 
     // =====================================
+    // LATEST GOLD RATE
+    // =====================================
+
+    const latestGoldRate =
+
+      await GoldRate.findOne()
+
+        .sort({
+          createdAt: -1
+        });
+
+    const ratePerGram =
+
+      latestGoldRate?.ratePerGram || 0;
+
+    // =====================================
+    // USE HELPER
+    // =====================================
+
+    const updatedProduct =
+
+      calculateProductPrices(
+
+        product,
+
+        ratePerGram
+
+      );
+
+    // =====================================
     // RESPONSE
     // =====================================
 
@@ -867,7 +848,7 @@ exports.getProductById = async (
         'Product fetched successfully',
 
       data:
-        product
+        updatedProduct
 
     });
 
@@ -888,3 +869,480 @@ exports.getProductById = async (
 
 };
 
+exports.getProductsByType = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const type =
+      req.params.type.toUpperCase();
+
+    let filter = {
+      isActive: true
+    };
+
+    // =========================
+    // FILTERS
+    // =========================
+
+    if (type === "POPULAR") {
+
+      filter.popularCollection = true;
+
+    }
+
+    else if (type === "FEATURED") {
+
+      filter.featured = true;
+
+    }
+
+    else if (type === "BESTSELLER") {
+
+      filter.bestSeller = true;
+
+    }
+
+    else if (type === "TRENDING") {
+
+      filter.trending = true;
+
+    }
+
+    else if (type === "NEW") {
+
+      // no extra filter
+
+    }
+
+    else {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "Invalid Product Type"
+
+      });
+
+    }
+
+    // =========================
+    // LATEST GOLD RATE
+    // =========================
+
+    const latestGoldRate =
+
+      await GoldRate.findOne()
+
+        .sort({
+          createdAt: -1
+        });
+
+    const ratePerGram =
+
+      latestGoldRate?.ratePerGram || 0;
+
+    // =========================
+    // GET PRODUCTS
+    // =========================
+
+    const products =
+
+      await Product.find(filter)
+
+        .populate("category")
+
+        .populate("subCategory")
+
+        .populate("subSubCategory")
+
+        .sort({
+          createdAt: -1
+        });
+
+    // =========================
+    // USE HELPER
+    // =========================
+
+    const updatedProducts =
+
+      products.map(product =>
+
+        calculateProductPrices(
+
+          product,
+
+          ratePerGram
+
+        )
+
+      );
+
+    // =========================
+    // RESPONSE
+    // =========================
+
+    res.status(200).json({
+
+      success: true,
+
+      data:
+        updatedProducts
+
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message:
+        error.message
+
+    });
+
+  }
+
+};
+
+exports.getProductsByCategory = async (req, res) => {
+
+  try {
+
+    const {
+
+      category,
+
+      subCategory,
+
+      productType,
+
+      search = '',
+
+      minPrice,
+
+      maxPrice,
+
+      sort = 'latest',
+
+      featured,
+
+      trending,
+
+      bestSeller,
+
+      gender,
+
+      page = 1,
+
+      limit = 10
+
+    } = req.query;
+
+    // =========================
+    // PAGINATION
+    // =========================
+
+    const skip =
+
+      (Number(page) - 1) *
+      Number(limit);
+
+    // =========================
+    // FILTER OBJECT
+    // =========================
+
+    const filter = {
+
+      isActive: true
+
+    };
+
+    // =========================
+    // CATEGORY
+    // =========================
+
+    if (category) {
+
+      filter.category = category;
+
+    }
+
+    // =========================
+    // SUB CATEGORY
+    // =========================
+
+    if (subCategory) {
+
+      filter.subCategory =
+        subCategory;
+
+    }
+
+    // =========================
+    // PRODUCT TYPE
+    // =========================
+
+    if (
+      productType &&
+      productType !== 'ALL'
+    ) {
+
+      filter.productType =
+        productType;
+
+    }
+
+    // =========================
+    // FEATURED
+    // =========================
+
+    if (featured === 'true') {
+
+      filter.featured = true;
+
+    }
+
+    // =========================
+    // TRENDING
+    // =========================
+
+    if (trending === 'true') {
+
+      filter.trending = true;
+
+    }
+
+    // =========================
+    // BESTSELLER
+    // =========================
+
+    if (bestSeller === 'true') {
+
+      filter.bestSeller = true;
+
+    }
+
+    // =========================
+    // GENDER
+    // =========================
+
+    if (gender) {
+
+      filter.gender = gender;
+
+    }
+
+    // =========================
+    // SEARCH
+    // =========================
+
+    if (search) {
+
+      filter.name = {
+
+        $regex: search,
+
+        $options: 'i'
+
+      };
+
+    }
+
+    // =========================
+    // LATEST GOLD RATE
+    // =========================
+
+    const latestGoldRate =
+
+      await GoldRate.findOne()
+
+        .sort({
+          createdAt: -1
+        });
+
+    const ratePerGram =
+
+      latestGoldRate?.ratePerGram || 0;
+
+    // =========================
+    // FETCH PRODUCTS
+    // =========================
+
+    let products =
+
+      await Product.find(filter)
+
+        .populate(
+          'category',
+          'name image'
+        )
+
+        .populate(
+          'subCategory',
+          'name image'
+        )
+
+        .populate(
+          'subSubCategory',
+          'name image'
+        )
+
+        .sort({
+
+          createdAt:
+
+            sort === 'latest'
+              ? -1
+              : 1
+
+        })
+
+        .skip(skip)
+
+        .limit(Number(limit));
+
+    // =========================
+    // APPLY HELPER
+    // =========================
+
+    let updatedProducts =
+
+      products.map(product =>
+
+        calculateProductPrices(
+
+          product,
+
+          ratePerGram
+
+        )
+
+      );
+
+    // =========================
+    // PRICE FILTER
+    // =========================
+
+    if (minPrice || maxPrice) {
+
+      updatedProducts =
+
+        updatedProducts.filter(
+          product => {
+
+            const firstVariant =
+
+              product.variants?.[0];
+
+            const price =
+
+              firstVariant?.finalPrice ||
+
+              0;
+
+            return (
+
+              (!minPrice ||
+
+                price >= Number(minPrice))
+
+              &&
+
+              (!maxPrice ||
+
+                price <= Number(maxPrice))
+
+            );
+
+          }
+        );
+
+    }
+
+    // =========================
+    // LOW TO HIGH
+    // =========================
+
+    if (sort === 'lowToHigh') {
+
+      updatedProducts.sort(
+        (a, b) =>
+
+          (a.variants?.[0]?.finalPrice || 0)
+
+          -
+
+          (b.variants?.[0]?.finalPrice || 0)
+      );
+
+    }
+
+    // =========================
+    // HIGH TO LOW
+    // =========================
+
+    if (sort === 'highToLow') {
+
+      updatedProducts.sort(
+        (a, b) =>
+
+          (b.variants?.[0]?.finalPrice || 0)
+
+          -
+
+          (a.variants?.[0]?.finalPrice || 0)
+      );
+
+    }
+
+    // =========================
+    // TOTAL
+    // =========================
+
+    const total =
+
+      await Product.countDocuments(
+        filter
+      );
+
+    // =========================
+    // RESPONSE
+    // =========================
+
+    res.status(200).json({
+
+      success: true,
+
+      total,
+
+      currentPage:
+        Number(page),
+
+      totalPages:
+        Math.ceil(total / limit),
+
+      data:
+        updatedProducts
+
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message:
+        error.message
+
+    });
+
+  }
+
+};

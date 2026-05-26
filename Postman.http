@@ -133,20 +133,24 @@ GET http://localhost:3001/api/getAllProducts
 Content-Type: application/json
 
 ###
-GET http://localhost:3001/api/get-product/6a033a151d9cd834dbc9c09a
+GET http://localhost:3001/api/getProductsByType/TRENDING
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-product/6a1131a199ff7daa590ba97f
 Content-Type: application/json 
 
 ###
 PUT http://localhost:3001/api/update-product/6a033a151d9cd834dbc9c09a
 
 ###
-DELETE http://localhost:3001/api/Deleteproduct/6a017c6060862d1699e6cb2f
+DELETE http://localhost:3001/api/Deleteproduct/6a033a151d9cd834dbc9c09a
 Content-Type: application/json
 
 
 
 ###
-POST http://localhost:3001/api/Userregister
+POST http://localhost:3001/api/userregister
 Content-Type: application/json
 
 {
@@ -219,6 +223,11 @@ Content-Type: application/json
 GET http://localhost:3001/api/getcart/69f4455430a4633b9cd12af6
 Content-Type: application/json
 
+
+###
+GET http://localhost:3001/api/getProductsByCategory/6a0ff8d2c336f49446430815
+Content-Type: application/json
+
 ###
 PUT http://localhost:3001/api/cart/69f4fda00498cf0ca64fdbc0/item/69f4fda00498cf0ca64fdbc1
 Content-Type: application/json
@@ -228,8 +237,13 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3001/api/cart/69f4fda00498cf0ca64fdbc0/item/69f5022b0c4a8e5d2cbab15e
+PUT http://localhost:3001/api/clearCart/clear/
 Content-Type: application/json
+
+
+
+###
+DELETE http://localhost:3001/api/removeCart/6a147177f934c7d75178058a/item/6a147177f934c7d75178058b
 
 ###
 POST http://localhost:3001/api/wishlist
@@ -337,8 +351,50 @@ Content-Type: application/json
   "message": "Need diamond ring details"
 }
 
+###
+POST http://localhost:3001/api/create-coupon
+Content-Type: application/json
 
+{
+  "code": "OZO10",
+  "discountType": "PERCENTAGE",
+  "value": 10,
+  "minOrderAmount": 5000,
+  "expiryDate": "2026-12-31",
+  "isActive": true
+}
 
+###
+GET http://localhost:3001/api/getall-coupon
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getbyid-coupon/6a11d47c0606d6b0a7602281
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/updatecoupon/6a11d47c0606d6b0a7602281
+Content-Type: application/json
+
+{
+  "code": "OZO15",
+  "discountType": "PERCENTAGE",
+  "value": 15,
+  "minOrderAmount": 5000,
+  "expiryDate": "2026-12-31",
+  "isActive": true
+}
+
+###
+DELETE http://localhost:3001/api/Deletecoupon/6a11d47c0606d6b0a7602281
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-review
+
+###
+GET http://localhost:3001/api/getall-review
+Content-Type: application/json
 
 
 

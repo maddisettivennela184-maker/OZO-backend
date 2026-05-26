@@ -4,84 +4,98 @@ const mongoose = require("mongoose");
 // =========================
 // Diamond Details Schema
 // =========================
-const diamondSchema = new mongoose.Schema({
 
-  diamondType: {
-    type: String,
-    enum: ["NATURAL", "LAB_GROWN"],
-    default: "NATURAL"
-  },
+const diamondSchema =
+  new mongoose.Schema({
 
-  shape: {
-    type: String,
-    enum: [
-      "ROUND",
-      "OVAL",
-      "PRINCESS",
-      "CUSHION",
-      "EMERALD",
-      "PEAR",
-      "HEART",
-      "MARQUISE"
-    ]
-  },
+    diamondType: {
+      type: String,
+      enum: [
+        "NATURAL",
+        "LAB_GROWN"
+      ],
+      default: "NATURAL"
+    },
 
-  carat: {
-    type: Number
-  },
+    shape: {
+      type: String,
+      enum: [
+        "ROUND",
+        "OVAL",
+        "PRINCESS",
+        "CUSHION",
+        "EMERALD",
+        "PEAR",
+        "HEART",
+        "MARQUISE"
+      ]
+    },
 
-  color: {
-    type: String
-    // D, E, F, G...
-  },
+    carat: {
+      type: Number
+    },
 
-  clarity: {
-    type: String
-    // FL, IF, VVS1, VS1...
-  },
+    color: {
+      type: String
+    },
 
-  cut: {
-    type: String
-    // EX, VG, GOOD
-  },
+    clarity: {
+      type: String
+    },
 
-  polish: {
-    type: String
-  },
+    cut: {
+      type: String
+    },
 
-  symmetry: {
-    type: String
-  },
+    polish: {
+      type: String
+    },
 
-  fluorescence: {
-    type: String
-  },
+    symmetry: {
+      type: String
+    },
 
-  certificateLab: {
-    type: String,
-    enum: ["GIA", "IGI", "HRD", "AGS", "NONE"],
-    default: "NONE"
-  },
+    fluorescence: {
+      type: String
+    },
 
-  certificateNumber: {
-    type: String
-  },
+    certificateLab: {
+      type: String,
+      enum: [
+        "GIA",
+        "IGI",
+        "HRD",
+        "AGS",
+        "NONE"
+      ],
+      default: "NONE"
+    },
 
-  certificateUrl: {
-    type: String
-  },
+    certificateNumber: {
+      type: String
+    },
 
-  diamondPrice: {
-    type: Number,
-    default: 0
-  },
+    certificateUrl: {
+      type: String
+    },
 
-  totalDiamonds: {
-    type: Number,
-    default: 1
-  }
+    // SINGLE DIAMOND PRICE
 
-}, { _id: false });
+    diamondPrice: {
+      type: Number,
+      default: 0
+    },
+
+    // HOW MANY DIAMONDS
+
+    totalDiamonds: {
+      type: Number,
+      default: 1
+    }
+
+  }, {
+    _id: false
+  });
 
 
 
@@ -89,86 +103,85 @@ const diamondSchema = new mongoose.Schema({
 // =========================
 // Variant Schema
 // =========================
-const variantSchema = new mongoose.Schema({
 
-  size: {
-    type: String
-  },
+const variantSchema =
+  new mongoose.Schema({
 
-  stock: {
-    type: Number,
-    default: 0
-  },
+    size: {
+      type: String
+    },
 
-  // GOLD DETAILS
-  goldPurity: {
-    type: String,
-    enum: ["14K", "18K", "22K", "24K"]
-  },
+    stock: {
+      type: Number,
+      default: 0
+    },
 
-  goldColor: {
-    type: String,
-    enum: ["YELLOW", "WHITE", "ROSE"]
-  },
+    // =========================
+    // GOLD DETAILS
+    // =========================
 
-  grossWeight: {
-    type: Number
-  },
+    goldPurity: {
+      type: String,
+      enum: [
+        "14K",
+        "18K",
+        "22K",
+        "24K"
+      ]
+    },
 
-  netWeight: {
-    type: Number
-  },
+    goldColor: {
+      type: String,
+      enum: [
+        "YELLOW",
+        "WHITE",
+        "ROSE"
+      ]
+    },
 
-  makingCharges: {
-    type: Number,
-    default: 0
-  },
+    grossWeight: {
+      type: Number
+    },
 
-  wastagePercentage: {
-    type: Number,
-    default: 0
-  },
+    netWeight: {
+      type: Number
+    },
 
-  goldRate: {
-    type: Number,
-    default: 0
-  },
+    wastagePercentage: {
+      type: Number,
+      default: 0
+    },
 
-  goldPrice: {
-    type: Number,
-    default: 0
-  },
+    // =========================
+    // MAKING CHARGES
+    // =========================
 
-  // DIAMOND DETAILS
-  hasDiamond: {
-    type: Boolean,
-    default: false
-  },
+    makingCharges: {
+      type: Number,
+      default: 0
+    },
 
-  diamonds: [diamondSchema],
+    // =========================
+    // DIAMONDS
+    // =========================
 
-  totalDiamondPrice: {
-    type: Number,
-    default: 0
-  },
+    hasDiamond: {
+      type: Boolean,
+      default: false
+    },
 
-  // FINAL PRICE
-  basePrice: {
-    type: Number,
-    default: 0
-  },
+    diamonds: [diamondSchema],
 
-  discountPercentage: {
-    type: Number,
-    default: 0
-  },
+    // =========================
+    // OFFER / DISCOUNT
+    // =========================
 
-  finalPrice: {
-    type: Number,
-    default: 0
-  }
+    discountPercentage: {
+      type: Number,
+      default: 0
+    }
 
-});
+  });
 
 
 
@@ -176,130 +189,162 @@ const variantSchema = new mongoose.Schema({
 // =========================
 // Product Schema
 // =========================
-const productSchema = new mongoose.Schema({
 
-  name: {
-    type: String,
-    required: true
-  },
+const productSchema =
+  new mongoose.Schema({
 
-  slug: {
-    type: String,
-    unique: true
-  },
+    name: {
+      type: String,
+      required: true
+    },
 
-  shortDescription: {
-    type: String
-  },
+    slug: {
+      type: String,
+      unique: true
+    },
 
-  description: {
-    type: String
-  },
+    shortDescription: {
+      type: String
+    },
 
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category"
-  },
+    description: {
+      type: String
+    },
 
-  subCategory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "SubCategory"
-  },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category"
+    },
 
-  subSubCategory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "SubSubCategory"
-  },
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory"
+    },
 
-  productType: {
-    type: String,
-    enum: [
-      "GOLD",
-      "DIAMOND",
-      "GOLD_DIAMOND"
+    subSubCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubSubCategory"
+    },
+
+    productType: {
+      type: String,
+      enum: [
+        "GOLD",
+        "DIAMOND",
+        "GOLD_DIAMOND"
+      ],
+      required: true
+    },
+
+    gender: {
+      type: String,
+      enum: [
+        "MEN",
+        "WOMEN",
+        "UNISEX"
+      ]
+    },
+
+    occasion: {
+      type: String
+    },
+
+    brand: {
+      type: String
+    },
+
+    sku: {
+      type: String,
+      unique: true
+    },
+
+    hallmarkCertified: {
+      type: Boolean,
+      default: true
+    },
+
+    certificationIncluded: {
+      type: Boolean,
+      default: true
+    },
+
+    featured: {
+      type: Boolean,
+      default: false
+    },
+
+    bestSeller: {
+      type: Boolean,
+      default: false
+    },
+
+    trending: {
+      type: Boolean,
+      default: false
+    },
+
+    // =========================
+    // VARIANTS
+    // =========================
+
+    variants: [variantSchema],
+
+    // =========================
+    // MEDIA
+    // =========================
+
+    images: [
+      {
+        type: String
+      }
     ],
-    required: true
-  },
 
-  gender: {
-    type: String,
-    enum: ["MEN", "WOMEN", "UNISEX"]
-  },
-
-  occasion: {
-    type: String
-  },
-
-  brand: {
-    type: String
-  },
-
-  sku: {
-    type: String,
-    unique: true
-  },
-
-  hallmarkCertified: {
-    type: Boolean,
-    default: true
-  },
-
-  certificationIncluded: {
-    type: Boolean,
-    default: true
-  },
-
-  featured: {
-    type: Boolean,
-    default: false
-  },
-
-  bestSeller: {
-    type: Boolean,
-    default: false
-  },
-
-  trending: {
-    type: Boolean,
-    default: false
-  },
-
-  variants: [variantSchema],
-
-  images: [
-    {
+    video: {
       type: String
-    }
-  ],
+    },
 
-  video: {
-    type: String
-  },
+    // =========================
+    // TAGS
+    // =========================
 
-  tags: [
-    {
+    tags: [
+      {
+        type: String
+      }
+    ],
+
+    // =========================
+    // SEO
+    // =========================
+
+    seoTitle: {
       type: String
+    },
+
+    seoDescription: {
+      type: String
+    },
+
+    // =========================
+    // STATUS
+    // =========================
+
+    isActive: {
+      type: Boolean,
+      default: true
     }
-  ],
 
-  seoTitle: {
-    type: String
-  },
+  }, {
+    timestamps: true
+  });
 
-  seoDescription: {
-    type: String
-  },
-
-  isActive: {
-    type: Boolean,
-    default: true
-  }
-
-}, {
-  timestamps: true
-});
 
 
 module.exports =
+
   mongoose.models.Product ||
-  mongoose.model("Product", productSchema);
+
+  mongoose.model(
+    "Product",
+    productSchema
+  );

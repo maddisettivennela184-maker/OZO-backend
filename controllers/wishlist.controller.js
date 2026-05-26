@@ -4,7 +4,7 @@ const Wishlist =
 const Product =
   require("../models/product");
 
-  const GoldRate =
+const GoldRate =
   require("../models/gold-rate");
 
 
@@ -58,9 +58,9 @@ exports.addToWishlist =
         wishlist.items.find(
           (item) =>
             item.product.toString() ===
-              product &&
+            product &&
             item.variantId?.toString() ===
-              variantId
+            variantId
         );
 
       if (alreadyExists) {
@@ -94,109 +94,85 @@ exports.addToWishlist =
     }
   };
 
-  /*
+/*
 GET WISHLIST
 */
-exports.getWishlist =
-  async (req, res) => {
-    try {
-      const goldRate =
-        await GoldRate.findOne()
-          .sort({ createdAt: -1 });
+exports.getWishlist = async (req, res) => {
+  try {
+    const goldRate = await GoldRate.findOne().sort({ createdAt: -1 });
 
-      const wishlist =
-        await Wishlist.findOne({
-          user: req.params.userId
-        })
-        .populate("items.product");
+    const wishlist = await Wishlist.findOne({
+      user: req.params.userId
+    }).populate("items.product");
 
-      if (!wishlist) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Wishlist not found"
-        });
-      }
-
-      const wishlistItems =
-        wishlist.items.map((item) => {
-
-          const product =
-            item.product;
-
-          const selectedVariant =
-            product.variants.id(
-              item.variantId
-            );
-
-          if (!selectedVariant) {
-            return null;
-          }
-
-          const goldCost =
-            (selectedVariant.weight || 0) *
-            goldRate.ratePerGram;
-
-          const totalPrice =
-            goldCost +
-            (selectedVariant.makingCharges || 0) +
-            (selectedVariant.diamondPrice || 0);
-
-          const discountAmount =
-            (totalPrice *
-              (selectedVariant.discountPercentage || 0)) / 100;
-
-          const finalPrice =
-            totalPrice -
-            discountAmount;
-
-          return {
-            wishlistItemId:
-              item._id,
-
-            productName:
-              product.name,
-
-            image:
-              product.images[0],
-
-            selectedVariant: {
-              ...selectedVariant.toObject(),
-
-              goldRatePerGram:
-                goldRate.ratePerGram,
-
-              goldCost,
-
-              totalPrice,
-
-              finalPrice
-            }
-          };
-        }).filter(Boolean);
-
-      res.status(200).json({
-        success: true,
-        message:
-          "Wishlist fetched successfully",
-
-        wishlistId:
-          wishlist._id,
-
-        items:
-          wishlistItems
-      });
-
-    } catch (error) {
-      res.status(500).json({
+    if (!wishlist) {
+      return res.status(404).json({
         success: false,
-        message:
-          error.message
+        message: "Wishlist not found"
       });
     }
-  };
 
-  exports.removeWishlistItem =
+    const wishlistItems = wishlist.items.map((item) => {
+      const product = item.product;
+
+      if (!product) {
+        return null;
+      }
+
+      const selectedVariant = product.variants.id(item.variantId);
+
+      if (!selectedVariant) {
+        return null;
+      }
+
+      const goldCost =
+        (selectedVariant.weight || selectedVariant.netWeight || 0) *
+        (goldRate?.ratePerGram || 0);
+
+      const totalPrice =
+        goldCost +
+        (selectedVariant.makingCharges || 0) +
+        (selectedVariant.diamondPrice || selectedVariant.totalDiamondPrice || 0);
+
+      const discountAmount =
+        (totalPrice * (selectedVariant.discountPercentage || 0)) / 100;
+
+      const finalPrice = totalPrice - discountAmount;
+
+      return {
+        wishlistItemId: item._id.toString(),
+        productId: product._id.toString(),
+        variantId: selectedVariant._id.toString(),
+        productName: product.name,
+        image: product.images?.[0] || "",
+        variants:
+          product.variants || [],
+        selectedVariant: {
+          ...selectedVariant.toObject(),
+          _id: selectedVariant._id.toString(),
+          goldRatePerGram: goldRate?.ratePerGram || 0,
+          goldCost,
+          totalPrice,
+          finalPrice
+        }
+      };
+    }).filter(Boolean);
+
+    res.status(200).json({
+      success: true,
+      message: "Wishlist fetched successfully",
+      wishlistId: wishlist._id.toString(),
+      items: wishlistItems
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+exports.removeWishlistItem =
   async (req, res) => {
     try {
       const wishlist =

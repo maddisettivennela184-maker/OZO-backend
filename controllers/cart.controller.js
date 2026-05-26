@@ -75,34 +75,58 @@ exports.addToCart = async (req, res) => {
 
 /*
 GET CART
-*/
-exports.getCart = async (req, res) => {
+*/exports.getCart = async (req, res) => {
+
   try {
+
+    // =========================
+    // LATEST GOLD RATE
+    // =========================
 
     const goldRate =
       await GoldRate.findOne()
         .sort({ createdAt: -1 });
 
+    // =========================
+    // GET USER CART
+    // =========================
+
     const cart =
       await Cart.findOne({
-        user: req.params.userId
+
+        user:
+          req.params.userId
+
       })
-      .populate("items.product");
+
+        .populate("items.product");
 
     if (!cart) {
+
       return res.status(404).json({
+
         success: false,
-        message: "Cart not found"
+
+        message:
+          "Cart not found"
+
       });
+
     }
 
+    // =========================
+    // PREPARE CART ITEMS
+    // =========================
+
     const cartItems =
+
       cart.items.map((item) => {
 
         const product =
           item.product;
 
         const selectedVariant =
+
           product.variants.id(
             item.variantId
           );
@@ -111,28 +135,112 @@ exports.getCart = async (req, res) => {
           return null;
         }
 
+        // =====================
+        // GOLD COST
+        // =====================
+
         const goldCost =
-          (selectedVariant.weight || 0) *
-          goldRate.ratePerGram;
+
+          Number(
+            selectedVariant.netWeight || 0
+          ) *
+
+          Number(
+            goldRate?.ratePerGram || 0
+          );
+
+        // =====================
+        // WASTAGE PRICE
+        // =====================
+
+        const wastagePrice =
+
+          (
+            goldCost *
+
+            Number(
+              selectedVariant.wastagePercentage || 0
+            )
+
+          ) / 100;
+
+        // =====================
+        // DIAMOND PRICE
+        // =====================
+
+        let totalDiamondPrice = 0;
+
+        selectedVariant.diamonds.forEach(
+          (diamond) => {
+
+            totalDiamondPrice +=
+
+              Number(
+                diamond.diamondPrice || 0
+              ) *
+
+              Number(
+                diamond.totalDiamonds || 1
+              );
+
+          }
+        );
+
+        // =====================
+        // TOTAL PRICE
+        // =====================
 
         const variantTotalPrice =
+
           goldCost +
-          (selectedVariant.makingCharges || 0) +
-          (selectedVariant.diamondPrice || 0);
+
+          wastagePrice +
+
+          Number(
+            selectedVariant.makingCharges || 0
+          ) +
+
+          totalDiamondPrice;
+
+        // =====================
+        // DISCOUNT
+        // =====================
 
         const discountAmount =
-          (variantTotalPrice *
-            (selectedVariant.discountPercentage || 0)) / 100;
+
+          (
+            variantTotalPrice *
+
+            Number(
+              selectedVariant.discountPercentage || 0
+            )
+
+          ) / 100;
+
+        // =====================
+        // FINAL PRICE
+        // =====================
 
         const finalPrice =
+
           variantTotalPrice -
           discountAmount;
 
+        // =====================
+        // ITEM TOTAL
+        // =====================
+
         const totalPrice =
+
           finalPrice *
           item.quantity;
 
+        // =====================
+        // RETURN ITEM
+        // =====================
+
         return {
+
           cartItemId:
             item._id,
 
@@ -143,28 +251,44 @@ exports.getCart = async (req, res) => {
             product.images[0],
 
           selectedVariant: {
+
             ...selectedVariant.toObject(),
 
             goldRatePerGram:
-              goldRate.ratePerGram,
+              goldRate?.ratePerGram || 0,
 
             goldCost,
+
+            wastagePrice,
+
+            totalDiamondPrice,
 
             totalPrice:
               variantTotalPrice,
 
+            discountAmount,
+
             finalPrice
+
           },
 
           quantity:
             item.quantity,
 
           totalPrice
+
         };
+
       }).filter(Boolean);
 
+    // =========================
+    // RESPONSE
+    // =========================
+
     res.status(200).json({
+
       success: true,
+
       message:
         "Cart fetched successfully",
 
@@ -172,20 +296,27 @@ exports.getCart = async (req, res) => {
         cart._id,
 
       items:
-        cartItems
+        cartItems,
+
+      cartCount:
+        cart.items.length
+
     });
 
   } catch (error) {
+
     res.status(500).json({
+
       success: false,
+
       message:
         error.message
+
     });
+
   }
+
 };
-
-
-
 
 /*
 UPDATE CART ITEM
@@ -256,38 +387,106 @@ exports.updateCartItem = async (req, res) => {
 /*
 REMOVE CART ITEM
 */
-exports.removeCartItem = async (req, res) => {
+exports.removeCartItem = async (
+  req,
+  res
+) => {
+
   try {
+
+    const {
+
+      cartId,
+
+      itemId
+
+    } = req.params;
+
+    // =========================
+    // FIND CART
+    // =========================
+
     const cart =
-      await Cart.findById(req.params.cartId);
+
+      await Cart.findById(
+        cartId
+      );
+
+    // =========================
+    // CART NOT FOUND
+    // =========================
 
     if (!cart) {
+
       return res.status(404).json({
+
         success: false,
-        message: "Cart not found"
+
+        message:
+          'Cart not found'
+
       });
+
     }
 
+    // =========================
+    // REMOVE ITEM
+    // =========================
+
     cart.items =
+
       cart.items.filter(
-        (item) =>
-          item._id.toString() !==
-          req.params.itemId
+
+        item =>
+
+          item._id.toString()
+
+          !==
+
+          itemId
+
       );
+
+    // =========================
+    // SAVE CART
+    // =========================
 
     await cart.save();
 
+    // =========================
+    // RESPONSE
+    // =========================
+
     res.status(200).json({
+
       success: true,
-      message: "Item removed from cart"
+
+      message:
+        'Cart item removed successfully',
+
+      cartCount:
+        cart.items.length,
+
+      data:
+        cart
+
     });
 
   } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
+
       success: false,
-      message: error.message
+
+      message:
+        error.message
+
     });
+
   }
+
 };
 
 
@@ -324,4 +523,74 @@ exports.clearCart = async (req, res) => {
       message: error.message
     });
   }
+};
+
+exports.updateCartQuantity = async (req, res) => {
+
+  try {
+
+    const {
+      cartId,
+      itemId
+    } = req.params;
+
+    const {
+      quantity
+    } = req.body;
+
+    const cart =
+      await Cart.findById(cartId);
+
+    if (!cart) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message: "Cart not found"
+
+      });
+
+    }
+
+    const item =
+      cart.items.id(itemId);
+
+    if (!item) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message: "Item not found"
+
+      });
+
+    }
+
+    item.quantity = quantity;
+
+    await cart.save();
+
+    res.status(200).json({
+
+      success: true,
+
+      message:
+        "Quantity updated"
+
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message: error.message
+
+    });
+
+  }
+
 };

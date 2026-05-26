@@ -1,7 +1,9 @@
 const User = require("../models/user-login");
 const bcrypt = require("bcrypt");
-const jwt =require("jsonwebtoken");
-
+const jwt = require("jsonwebtoken");
+const Cart = require("../models/cart");
+const Wishlist = require("../models/wishlist");
+const Order = require("../models/order");
 const {
   transporter
 } = require(
@@ -80,7 +82,7 @@ exports.Userregister =
     }
   };
 
-  exports.userLogin =
+exports.userLogin =
   async (req, res) => {
     try {
       const {
@@ -158,8 +160,8 @@ exports.Userregister =
   };
 
 
-  // forgot password
-  exports.userforgotPassword =
+// forgot password
+exports.userforgotPassword =
   async (req, res) => {
     try {
       const { email } =
@@ -228,9 +230,9 @@ exports.Userregister =
   };
 
 
-  // verify password
+// verify password
 
-  exports.verifyOTP =
+exports.verifyOTP =
   async (req, res) => {
     try {
       const {
@@ -285,8 +287,8 @@ exports.Userregister =
     }
   };
 
-  // Resend OTP
-  exports.resendOTP =
+// Resend OTP
+exports.resendOTP =
   async (req, res) => {
     try {
       const { email } =
@@ -345,9 +347,9 @@ exports.Userregister =
       });
     }
   };
-  // Reset Password
+// Reset Password
 
-  exports.userresetPassword =
+exports.userresetPassword =
   async (req, res) => {
     try {
       const {
@@ -397,52 +399,179 @@ exports.Userregister =
     }
   };
 
-  exports.getAllUsers =
-async (req, res) => {
-  try {
+exports.getAllUsers =
+  async (req, res) => {
+    try {
 
-    const users =
-      await User.find()
-      .sort({
-        createdAt: -1
+      const users =
+        await User.find()
+          .sort({
+            createdAt: -1
+          });
+
+      res.status(200).json({
+        success: true,
+        count:
+          users.length,
+        data: users
       });
 
-    res.status(200).json({
-      success: true,
-      count:
-        users.length,
-      data: users
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message:
-        error.message
-    });
-  }
-};
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message:
+          error.message
+      });
+    }
+  };
 
 /*
 GET USERS COUNT
 */
 exports.getUsersCount =
-async (req, res) => {
+  async (req, res) => {
+    try {
+
+      const totalUsers =
+        await User.countDocuments();
+
+      res.status(200).json({
+        success: true,
+        totalUsers
+      });
+
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message:
+          error.message
+      });
+    }
+  };
+
+exports.getProfileSummary = async (
+  req,
+  res
+) => {
+
   try {
 
-    const totalUsers =
-      await User.countDocuments();
+    const { userId } =
+      req.params;
+
+    // ======================
+    // USER
+    // ======================
+
+    const user =
+      await User.findById(userId)
+        .select(
+          "name email mobile profileImage"
+        );
+
+    if (!user) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message:
+          "User not found"
+
+      });
+
+    }
+
+    // ======================
+    // CART COUNT
+    // ======================
+
+    const cart =
+      await Cart.findOne({
+        user: userId
+      });
+
+    const cartCount =
+      cart?.items?.length || 0;
+
+    // ======================
+    // WISHLIST COUNT
+    // ======================
+
+    const wishlist =
+      await Wishlist.findOne({
+        user: userId
+      });
+
+    const wishlistCount =
+      wishlist?.items?.length || 0;
+
+    // ======================
+    // ORDER COUNT
+    // ======================
+
+    const ordersCount =
+      await Order.countDocuments({
+        user: userId
+      });
+
+    // ======================
+    // RESPONSE
+    // ======================
 
     res.status(200).json({
+
       success: true,
-      totalUsers
+
+      data: {
+
+        user: {
+
+          _id:
+            user._id,
+
+          name:
+            user.name,
+
+          email:
+            user.email,
+
+          mobile:
+            user.mobile,
+
+          profileImage:
+            user.profileImage || ''
+
+        },
+
+        counts: {
+
+          orders:
+            ordersCount,
+
+          wishlist:
+            wishlistCount,
+
+          cart:
+            cartCount
+
+        }
+
+      }
+
     });
 
   } catch (error) {
+
     res.status(500).json({
+
       success: false,
+
       message:
         error.message
+
     });
+
   }
+
 };

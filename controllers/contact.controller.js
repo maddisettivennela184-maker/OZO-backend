@@ -1,6 +1,6 @@
 const Contact =
-require("../models/contact");
-
+  require("../models/contact");
+const User = require("../models/user-login");
 
 /*
 =====================================
@@ -9,35 +9,63 @@ CREATE CONTACT
 */
 
 exports.createContact =
-async (req, res) => {
+  async (req, res) => {
 
-  try {
+    try {
 
-    const {
+      const {
+        user,
+        name,
+        email,
+        phone,
+        subject,
+        message
+      } = req.body;
 
-      name,
+      // =====================
+      // USER VALIDATION
+      // =====================
 
-      email,
+      if (!user) {
 
-      phone,
+        return res.status(400).json({
 
-      subject,
+          success: false,
 
-      message
+          message:
+            "Please login first"
 
-    } = req.body;
+        });
 
-    // VALIDATION
+      }
 
-    if (
-      !name ||
-      !email ||
-      !phone
-    ) {
+      const userExists =
+        await User.findById(user);
 
-      return res
-        .status(400)
-        .json({
+      if (!userExists) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "User not found"
+
+        });
+
+      }
+
+      // =====================
+      // FORM VALIDATION
+      // =====================
+
+      if (
+        !name ||
+        !email ||
+        !phone
+      ) {
+
+        return res.status(400).json({
 
           success: false,
 
@@ -46,56 +74,62 @@ async (req, res) => {
 
         });
 
-    }
+      }
 
-    // CREATE
+      // =====================
+      // CREATE CONTACT
+      // =====================
 
-    const contact =
-      await Contact.create({
+      const contact =
+        await Contact.create({
 
-        name,
+          user,
 
-        email,
+          name,
 
-        phone,
+          email,
 
-        subject,
+          phone,
 
-        message
+          subject,
+
+          message
+
+        });
+      console.log("CONTACT", contact);
+
+      // =====================
+      // RESPONSE
+      // =====================
+
+      res.status(201).json({
+
+        success: true,
+
+        message:
+          "Contact created successfully",
+
+        data:
+          contact
 
       });
 
-    // RESPONSE
+    } catch (error) {
 
-    res.status(201).json({
+      console.log(error);
 
-      success: true,
+      res.status(500).json({
 
-      message:
-        "Contact created successfully",
+        success: false,
 
-      data:
-        contact
+        message:
+          error.message
 
-    });
+      });
 
-  } catch (error) {
+    }
 
-    console.log(error);
-
-    res.status(500).json({
-
-      success: false,
-
-      message:
-        error.message
-
-    });
-
-  }
-
-};
-
+  };
 
 
 /*
@@ -104,42 +138,32 @@ GET ALL CONTACTS
 =====================================
 */
 
-exports.getAllContacts =
-async (req, res) => {
-
+exports.getAllContacts = async (req, res) => {
   try {
 
-    const contacts =
-      await Contact.find()
+    const contacts = await Contact.find()
+      .populate(
+        "user",
+        "name phone email createdAt"
+      )
       .sort({
         createdAt: -1
       });
 
     res.status(200).json({
-
       success: true,
-
-      message:
-        "Contacts fetched successfully",
-
-      data:
-        contacts
-
+      message: "Contacts fetched successfully",
+      data: contacts
     });
 
   } catch (error) {
 
     res.status(500).json({
-
       success: false,
-
-      message:
-        error.message
-
+      message: error.message
     });
 
   }
-
 };
 
 
@@ -151,56 +175,56 @@ GET SINGLE CONTACT
 */
 
 exports.getContactById =
-async (req, res) => {
+  async (req, res) => {
 
-  try {
+    try {
 
-    const contact =
-      await Contact.findById(
-        req.params.id
-      );
+      const contact =
+        await Contact.findById(
+          req.params.id
+        );
 
-    if (!contact) {
+      if (!contact) {
 
-      return res
-        .status(404)
-        .json({
+        return res
+          .status(404)
+          .json({
 
-          success: false,
+            success: false,
 
-          message:
-            "Contact not found"
+            message:
+              "Contact not found"
 
-        });
+          });
+
+      }
+
+      res.status(200).json({
+
+        success: true,
+
+        message:
+          "Contact fetched successfully",
+
+        data:
+          contact
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          error.message
+
+      });
 
     }
 
-    res.status(200).json({
-
-      success: true,
-
-      message:
-        "Contact fetched successfully",
-
-      data:
-        contact
-
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-
-      success: false,
-
-      message:
-        error.message
-
-    });
-
-  }
-
-};
+  };
 
 
 
@@ -211,69 +235,69 @@ UPDATE CONTACT
 */
 
 exports.updateContact =
-async (req, res) => {
+  async (req, res) => {
 
-  try {
+    try {
 
-    const contact =
-      await Contact.findById(
-        req.params.id
-      );
+      const contact =
+        await Contact.findById(
+          req.params.id
+        );
 
-    if (!contact) {
+      if (!contact) {
 
-      return res
-        .status(404)
-        .json({
+        return res
+          .status(404)
+          .json({
 
-          success: false,
+            success: false,
 
-          message:
-            "Contact not found"
+            message:
+              "Contact not found"
 
-        });
+          });
+
+      }
+
+      const updatedContact =
+        await Contact.findByIdAndUpdate(
+
+          req.params.id,
+
+          req.body,
+
+          {
+            new: true
+          }
+
+        );
+
+      res.status(200).json({
+
+        success: true,
+
+        message:
+          "Contact updated successfully",
+
+        data:
+          updatedContact
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          error.message
+
+      });
 
     }
 
-    const updatedContact =
-      await Contact.findByIdAndUpdate(
-
-        req.params.id,
-
-        req.body,
-
-        {
-          new: true
-        }
-
-      );
-
-    res.status(200).json({
-
-      success: true,
-
-      message:
-        "Contact updated successfully",
-
-      data:
-        updatedContact
-
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-
-      success: false,
-
-      message:
-        error.message
-
-    });
-
-  }
-
-};
+  };
 
 
 
@@ -284,50 +308,50 @@ DELETE CONTACT
 */
 
 exports.deleteContact =
-async (req, res) => {
+  async (req, res) => {
 
-  try {
+    try {
 
-    const contact =
-      await Contact.findByIdAndDelete(
-        req.params.id
-      );
+      const contact =
+        await Contact.findByIdAndDelete(
+          req.params.id
+        );
 
-    if (!contact) {
+      if (!contact) {
 
-      return res
-        .status(404)
-        .json({
+        return res
+          .status(404)
+          .json({
 
-          success: false,
+            success: false,
 
-          message:
-            "Contact not found"
+            message:
+              "Contact not found"
 
-        });
+          });
+
+      }
+
+      res.status(200).json({
+
+        success: true,
+
+        message:
+          "Contact deleted successfully"
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          error.message
+
+      });
 
     }
 
-    res.status(200).json({
-
-      success: true,
-
-      message:
-        "Contact deleted successfully"
-
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-
-      success: false,
-
-      message:
-        error.message
-
-    });
-
-  }
-
-};
+  };

@@ -575,3 +575,38 @@ exports.getProfileSummary = async (
   }
 
 };
+
+
+/*
+LOGOUT
+*/
+exports.userLogout = async (req, res) => {
+  try {
+
+    const { userId } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    user.token = null;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Logout successful"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};

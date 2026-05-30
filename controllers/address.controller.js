@@ -1,6 +1,6 @@
 const Address =
   require("../models/address");
-  
+
 
 exports.createAddress =
   async (req, res) => {
@@ -70,7 +70,7 @@ exports.createAddress =
     }
   };
 
-  exports.getAddresses =
+exports.getAddresses =
   async (req, res) => {
     try {
       const addresses =
@@ -94,7 +94,7 @@ exports.createAddress =
     }
   };
 
- /*
+/*
 GET ALL ADDRESSES
 */
 /*
@@ -103,27 +103,27 @@ GET ALL ADDRESSES
 GET ALL ADDRESSES
 */
 exports.getAllAddresses =
-async (req, res) => {
-  try {
+  async (req, res) => {
+    try {
 
-    const addresses =
-      await Address.find()
-      .populate("user");
+      const addresses =
+        await Address.find()
+          .populate("user");
 
-    res.status(200).json({
-      success: true,
-      data: addresses
-    });
+      res.status(200).json({
+        success: true,
+        data: addresses
+      });
 
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message:
-        error.message
-    });
-  }
-};
- 
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message:
+          error.message
+      });
+    }
+  };
+
 
 /*
 UPDATE ADDRESS
@@ -212,7 +212,7 @@ exports.updateAddress =
     }
   };
 
-  exports.deleteAddress =
+exports.deleteAddress =
   async (req, res) => {
     try {
       const address =
@@ -241,4 +241,50 @@ exports.updateAddress =
           error.message
       });
     }
+  };
+
+exports.getAddressById =
+  async (req, res) => {
+
+    try {
+
+      const address =
+        await Address.findById(
+          req.params.id
+        );
+
+      if (!address) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Address not found"
+
+        });
+
+      }
+
+      res.status(200).json({
+
+        success: true,
+
+        data: address
+
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          error.message
+
+      });
+
+    }
+
   };

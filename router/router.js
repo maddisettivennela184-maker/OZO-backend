@@ -11,10 +11,10 @@ const { createCategory, getAllCategories, getCategoryById, updateCategory, delet
 const { getSubCategoryByCategory, createSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory, deleteSubCategory } = require("../controllers/subcategory.controller");
 const { getSubSubCategoryBySubCategory, createSubSubCategory, getAllSubSubCategories, getSubSubCategoryById, updateSubSubCategory, deleteSubSubCategory } = require("../controllers/subsubcategory.controller");
 const { createProduct, getAllProducts, getAllProductsWithPagination, getProductsByType, getProductById, updateProduct, deleteProduct, getProductsByCategory } = require("../controllers/product.controller");
-const { getAllUsers, getUsersCount, getProfileSummary, Userregister, userLogin, userforgotPassword, verifyOTP, resendOTP, userresetPassword } = require("../controllers/userlogin.controller");
+const { getAllUsers, getUsersCount, getProfileSummary, userLogout, Userregister, userLogin, userforgotPassword, verifyOTP, resendOTP, userresetPassword } = require("../controllers/userlogin.controller");
 const { addToCart, getCart, updateCartItem, removeCartItem, clearCart } = require("../controllers/cart.controller");
 const { addToWishlist, getWishlist, removeWishlistItem } = require("../controllers/wishlist.controller");
-const { createAddress, getAddresses, updateAddress, deleteAddress, getAllAddresses } = require("../controllers/address.controller");
+const { createAddress, getAddresses, getAddressById, updateAddress, deleteAddress, getAllAddresses } = require("../controllers/address.controller");
 const { createBanner, updateBanner, getAllBanners, deleteBanner } = require("../controllers/banner.controller");
 const { createContact, getAllContacts, getContactById, updateContact, deleteContact } = require("../controllers/contact.controller");
 const { createCoupon, getAllCoupons, getCouponById, updateCoupon, deleteCoupon } = require("../controllers/coupon.controller");
@@ -102,6 +102,7 @@ router.post("/user-reset-password", userresetPassword);
 router.get("/getAllUsers", getAllUsers);
 router.get("/getUsersCount", getUsersCount);
 router.get("/profileSummary/:userId", getProfileSummary);
+router.post("/logout", userLogout);
 
 
 
@@ -119,6 +120,7 @@ router.delete("/wishlist/:wishlistId/item/:itemId", removeWishlistItem);
 
 router.post("/Createaddress", createAddress);
 router.get("/address/:userId", getAddresses);
+router.get("/addressbyid/:id", getAddressById);
 router.put("/updateaddress/:id", updateAddress);
 router.delete("/Deleteaddress/:id", deleteAddress);
 router.get("/getAllAddress", getAllAddresses);

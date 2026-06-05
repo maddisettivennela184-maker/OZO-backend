@@ -288,3 +288,39 @@ exports.getAddressById =
     }
 
   };
+
+
+exports.setDefaultAddress =
+  async (req, res) => {
+
+    const address =
+      await Address.findById(
+        req.params.id
+      );
+
+    if (!address) {
+      return res.status(404).json({
+        success: false
+      });
+    }
+
+    await Address.updateMany(
+      {
+        user: address.user
+      },
+      {
+        isDefault: false
+      }
+    );
+
+    address.isDefault = true;
+
+    await address.save();
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Default address updated"
+    });
+
+  };

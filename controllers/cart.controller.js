@@ -1,6 +1,6 @@
 const Cart = require("../models/cart");
 const Product = require("../models/product");
-const GoldRate = require("../models/gold-rate");
+const calculateVariantPrice = require("../utils/price-calculator");
 
 
 
@@ -75,17 +75,10 @@ exports.addToCart = async (req, res) => {
 
 /*
 GET CART
-*/exports.getCart = async (req, res) => {
+*/
+exports.getCart = async (req, res) => {
 
   try {
-
-    // =========================
-    // LATEST GOLD RATE
-    // =========================
-
-    const goldRate =
-      await GoldRate.findOne()
-        .sort({ createdAt: -1 });
 
     // =========================
     // GET USER CART
@@ -120,166 +113,103 @@ GET CART
 
     const cartItems =
 
-      cart.items.map((item) => {
+      await Promise.all(
 
-        const product =
-          item.product;
+        cart.items.map(
+          async (item) => {
 
-        const selectedVariant =
+            const product =
+              item.product;
 
-          product.variants.id(
-            item.variantId
-          );
+            const selectedVariant =
 
-        if (!selectedVariant) {
-          return null;
-        }
-
-        // =====================
-        // GOLD COST
-        // =====================
-
-        const goldCost =
-
-          Number(
-            selectedVariant.netWeight || 0
-          ) *
-
-          Number(
-            goldRate?.ratePerGram || 0
-          );
-
-        // =====================
-        // WASTAGE PRICE
-        // =====================
-
-        const wastagePrice =
-
-          (
-            goldCost *
-
-            Number(
-              selectedVariant.wastagePercentage || 0
-            )
-
-          ) / 100;
-
-        // =====================
-        // DIAMOND PRICE
-        // =====================
-
-        let totalDiamondPrice = 0;
-
-        selectedVariant.diamonds.forEach(
-          (diamond) => {
-
-            totalDiamondPrice +=
-
-              Number(
-                diamond.diamondPrice || 0
-              ) *
-
-              Number(
-                diamond.totalDiamonds || 1
+              product.variants.id(
+                item.variantId
               );
 
+            if (!selectedVariant) {
+              return null;
+            }
+
+            // =====================
+            // CALCULATE PRICE
+            // =====================
+
+            const priceDetails =
+
+              await calculateVariantPrice(
+                selectedVariant
+              );
+
+            const totalPrice =
+
+              priceDetails.finalPrice *
+              item.quantity;
+
+            // =====================
+            // RETURN ITEM
+            // =====================
+
+            return {
+
+              cartItemId:
+                item._id,
+
+              productId:
+                product._id,
+
+              productName:
+                product.name,
+
+              image:
+                product.images?.[0] || "",
+
+              selectedVariant: {
+
+                ...selectedVariant.toObject(),
+
+                priceBreakup:
+                  priceDetails,
+
+                finalPrice:
+                  priceDetails.finalPrice
+
+              },
+
+              quantity:
+                item.quantity,
+
+              totalPrice:
+                Number(
+                  totalPrice.toFixed(2)
+                )
+
+            };
+
           }
-        );
+        )
 
-        // =====================
-        // TOTAL PRICE
-        // =====================
+      );
 
-        const variantTotalPrice =
+    // =========================
+    // CART TOTAL
+    // =========================
 
-          goldCost +
+    const validItems =
 
-          wastagePrice +
+      cartItems.filter(Boolean);
 
-          Number(
-            selectedVariant.makingCharges || 0
-          ) +
+    const cartTotal =
 
-          totalDiamondPrice;
+      validItems.reduce(
 
-        // =====================
-        // DISCOUNT
-        // =====================
+        (sum, item) =>
 
-        const discountAmount =
+          sum + item.totalPrice,
 
-          (
-            variantTotalPrice *
+        0
 
-            Number(
-              selectedVariant.discountPercentage || 0
-            )
-
-          ) / 100;
-
-        // =====================
-        // FINAL PRICE
-        // =====================
-
-        const finalPrice =
-
-          variantTotalPrice -
-          discountAmount;
-
-        // =====================
-        // ITEM TOTAL
-        // =====================
-
-        const totalPrice =
-
-          finalPrice *
-          item.quantity;
-
-        // =====================
-        // RETURN ITEM
-        // =====================
-
-        return {
-
-          cartItemId:
-            item._id,
-
-          productName:
-            product.name,
-
-          image:
-            product.images[0],
-
-          selectedVariant: {
-
-            ...selectedVariant.toObject(),
-
-            goldRatePerGram:
-              goldRate?.ratePerGram || 0,
-
-            goldCost,
-
-            wastagePrice,
-
-            totalDiamondPrice,
-
-            totalPrice:
-              variantTotalPrice,
-
-            discountAmount,
-
-            finalPrice
-
-          },
-
-          quantity:
-            item.quantity,
-
-          totalPrice
-
-        };
-
-      }).filter(Boolean);
+      );
 
     // =========================
     // RESPONSE
@@ -296,14 +226,21 @@ GET CART
         cart._id,
 
       items:
-        cartItems,
+        validItems,
 
       cartCount:
-        cart.items.length
+        validItems.length,
+
+      cartTotal:
+        Number(
+          cartTotal.toFixed(2)
+        )
 
     });
 
   } catch (error) {
+
+    console.log(error);
 
     res.status(500).json({
 

@@ -132,6 +132,41 @@ POST http://localhost:3001/api/create-product
 GET http://localhost:3001/api/getAllProducts
 Content-Type: application/json
 
+
+
+###
+GET http://localhost:3001/api/getAllMetalRates
+Content-Type: application/json
+
+
+###
+GET http://localhost:3001/api/getAllStoneRates
+Content-Type: application/json
+
+
+
+###
+GET http://localhost:3001/api/getall-contact  
+Content-Type: application/json
+
+
+###
+POST http://localhost:3001/api/create-contact  
+Content-Type: application/json
+
+{
+  "user":"6a13f56dbf6dce297ed289cc",
+  "name":"alksjdf",
+  "email":"a@gmail.com",
+  "phone":"9787987",
+  "subject":"adfasf",
+  "message":"adsfasf"
+}
+
+
+
+
+
 ###
 GET http://localhost:3001/api/getProductsByType/TRENDING
 Content-Type: application/json
@@ -409,3 +444,31 @@ Content-Type: application/json
 
 
 
+
+
+###
+POST http://localhost:3001/api/createMetalRate
+Content-Type: application/json
+
+{
+    
+    "metalType": "platinum",
+    "purity": "950",
+    "unit": "gram",
+    "ratePerGram": 4200,
+    "effectiveDate": "2026-06-01T00:00:00.000Z"
+
+}
+
+
+###
+POST http://localhost:3001/api/createStoneRate
+Content-Type: application/json
+
+{
+    "stoneType": "pearl",
+    "stoneCategory": "standard",
+    "quality": "A",
+    "unit": "piece",
+    "ratePerUnit": 1200
+}

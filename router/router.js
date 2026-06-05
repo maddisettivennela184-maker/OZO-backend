@@ -14,20 +14,18 @@ const { createProduct, getAllProducts, getAllProductsWithPagination, getProducts
 const { getAllUsers, getUsersCount, getProfileSummary, userLogout, Userregister, userLogin, userforgotPassword, verifyOTP, resendOTP, userresetPassword } = require("../controllers/userlogin.controller");
 const { addToCart, getCart, updateCartItem, removeCartItem, clearCart } = require("../controllers/cart.controller");
 const { addToWishlist, getWishlist, removeWishlistItem } = require("../controllers/wishlist.controller");
-const { createAddress, getAddresses, getAddressById, updateAddress, deleteAddress, getAllAddresses } = require("../controllers/address.controller");
+const { createAddress, getAddresses, getAddressById, updateAddress, deleteAddress, getAllAddresses, setDefaultAddress } = require("../controllers/address.controller");
 const { createBanner, updateBanner, getAllBanners, deleteBanner } = require("../controllers/banner.controller");
 const { createContact, getAllContacts, getContactById, updateContact, deleteContact } = require("../controllers/contact.controller");
 const { createCoupon, getAllCoupons, getCouponById, updateCoupon, deleteCoupon } = require("../controllers/coupon.controller");
 const { createReview, getAllReviews, getReviewById, getProductReviews, updateReview, deleteReview } = require("../controllers/review.controller");
+const { createMetalRate, getAllMetalRates, getMetalRateById, updateMetalRate, deleteMetalRate, toggleMetalRateStatus } = require("../controllers/metal-rate.controller");
+const { createStoneRate, getAllStoneRates, getStoneRateById, updateStoneRate, deleteStoneRate, toggleStoneRateStatus } = require("../controllers/stone-rate.controller");
 
-
+const { createSizeChart, getAllSizeCharts, getSizeChartBySubCategory, updateSizeChart, deleteSizeChart } = require("../controllers/size-chart.controller");
 const upload = require("../middleware/upload");
 
-const {
-  uploadCertificate
-} = require(
-  "../controllers/upload.controller"
-);
+const { uploadCertificate } = require("../controllers/upload.controller");
 
 
 router.post("/create-contact", createContact);
@@ -82,11 +80,7 @@ router.get("/get-product/:id", getProductById);
 router.delete("/Deleteproduct/:id", deleteProduct);
 router.get("/getProductsByCategory", getProductsByCategory);
 
-router.post(
-  "/upload-certificate",
-  upload.single("file"),
-  uploadCertificate
-);
+router.post("/upload-certificate", upload.single("file"), uploadCertificate);
 
 
 // router.post("/createProduct",upload.array("images", 10),createProduct);
@@ -124,6 +118,7 @@ router.get("/addressbyid/:id", getAddressById);
 router.put("/updateaddress/:id", updateAddress);
 router.delete("/Deleteaddress/:id", deleteAddress);
 router.get("/getAllAddress", getAllAddresses);
+router.post("/setDefaultAddress/:id", setDefaultAddress);
 
 
 router.post("/create-coupon", createCoupon);
@@ -149,5 +144,30 @@ router.post("/createBanner", upload.single("image"), createBanner);
 router.get("/getAllBanners", getAllBanners);
 router.delete("/deleteBanner/:id", deleteBanner);
 router.put("/updateBanner/:id", upload.single("image"), updateBanner);
+
+
+
+
+router.post("/createMetalRate", createMetalRate);
+router.get("/getAllMetalRates", getAllMetalRates);
+router.get("/getMetalRateById/:id", getMetalRateById);
+router.put("/updateMetalRate/:id", updateMetalRate);
+router.delete("/deleteMetalRate/:id", deleteMetalRate);
+router.patch("/toggleMetalRateStatus/:id/status", toggleMetalRateStatus);
+
+
+router.post("/createStoneRate", createStoneRate);
+router.get("/getAllStoneRates", getAllStoneRates);
+router.get("/getStoneRateById/:id", getStoneRateById);
+router.put("/updateStoneRate/:id", updateStoneRate);
+router.delete("/deleteStoneRate/:id", deleteStoneRate);
+router.patch("/toggleStoneRateStatus/:id/status", toggleStoneRateStatus);
+
+
+router.post("/create-size-chart", upload.single("image"), createSizeChart);
+router.get("/get-all-size-charts", getAllSizeCharts);
+router.get("/get-size-chart-by-sub-category/:subCategoryId", getSizeChartBySubCategory);
+router.put("/update-size-chart/:id", upload.single("image"), updateSizeChart);
+router.delete("/delete-size-chart/:id", deleteSizeChart);
 
 module.exports = router;

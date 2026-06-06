@@ -10,7 +10,7 @@ const { createGoldRate, getAllGoldRates, getGoldRateById, updateGoldRate, delete
 const { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory } = require("../controllers/category.controller");
 const { getSubCategoryByCategory, createSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory, deleteSubCategory } = require("../controllers/subcategory.controller");
 const { getSubSubCategoryBySubCategory, createSubSubCategory, getAllSubSubCategories, getSubSubCategoryById, updateSubSubCategory, deleteSubSubCategory } = require("../controllers/subsubcategory.controller");
-const { createProduct, getAllProducts, getAllProductsWithPagination, getProductsByType, getProductById, updateProduct, deleteProduct, getProductsByCategory } = require("../controllers/product.controller");
+const { createProduct, getAllProducts, getAllProductsWithPagination, getProductsByType, getProductById, updateProduct, deleteProduct, getProductsByCategory, getProductsByCategoryId } = require("../controllers/product.controller");
 const { getAllUsers, getUsersCount, getProfileSummary, userLogout, Userregister, userLogin, userforgotPassword, verifyOTP, resendOTP, userresetPassword } = require("../controllers/userlogin.controller");
 const { addToCart, getCart, updateCartItem, removeCartItem, clearCart } = require("../controllers/cart.controller");
 const { addToWishlist, getWishlist, removeWishlistItem } = require("../controllers/wishlist.controller");
@@ -79,6 +79,7 @@ router.get("/products", getAllProductsWithPagination);
 router.get("/get-product/:id", getProductById);
 router.delete("/Deleteproduct/:id", deleteProduct);
 router.get("/getProductsByCategory", getProductsByCategory);
+router.get('/getCategoryIdByProducts/:categoryId', getProductsByCategoryId);
 
 router.post("/upload-certificate", upload.single("file"), uploadCertificate);
 

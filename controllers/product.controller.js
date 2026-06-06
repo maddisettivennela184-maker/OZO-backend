@@ -1749,6 +1749,110 @@ exports.getProductById = async (
   }
 
 };
+
+exports.getProductsByCategoryId = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    // Validation
+    if (!categoryId || !categoryId.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Category ID is required"
+      });
+    }
+
+    // =====================================
+    // VALIDATE ObjectId FORMAT
+    // =====================================
+
+    const isValidObjectId = categoryId.match(/^[0-9a-fA-F]{24}$/);
+    if (!isValidObjectId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Category ID format"
+      });
+    }
+
+    // =====================================
+    // FIND PRODUCTS BY CATEGORY
+    // =====================================
+
+    console.log(`Searching for products with categoryId: ${categoryId}`);
+
+    const products = await Product.find({
+      category: categoryId  // MongoDB automatically converts string to ObjectId
+    })
+      .populate("category", "name image")
+      .populate("subCategory", "name image")
+      .populate("subSubCategory", "name image")
+      .lean();
+
+    console.log(`Found ${products.length} products for category ${categoryId}`);
+
+    // =====================================
+    // NO PRODUCTS FOUND
+    // =====================================
+
+    if (!products || products.length === 0) {
+      // Debug: Check if category exists
+      const categoryExists = await Product.findOne({ category: categoryId });
+      console.log("Category exists in products?", categoryExists ? "Yes" : "No");
+
+      return res.status(404).json({
+        success: false,
+        message: "No products found in this category",
+        debug: {
+          categoryId,
+          productsCount: 0
+        }
+      });
+    }
+
+    // =====================================
+    // CALCULATE VARIANT PRICES FOR ALL PRODUCTS
+    // =====================================
+
+    const productsWithPrices = await Promise.all(
+      products.map(async (product) => {
+        const variants = await Promise.all(
+          product.variants.map(async (variant) => {
+            const priceDetails = await calculateVariantPrice(variant);
+            return {
+              ...variant,
+              stones: priceDetails.stones,
+              calculatedPrice: priceDetails.finalPrice,
+              priceBreakup: priceDetails
+            };
+          })
+        );
+
+        return {
+          ...product,
+          variants: variants
+        };
+      })
+    );
+
+    // =====================================
+    // RESPONSE
+    // =====================================
+
+    res.status(200).json({
+      success: true,
+      message: "Products fetched successfully",
+      data: productsWithPrices,
+      count: productsWithPrices.length
+    });
+
+  } catch (error) {
+    console.log("Error in getProductsByCategoryId:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 exports.getProductsByType = async (
   req,
   res

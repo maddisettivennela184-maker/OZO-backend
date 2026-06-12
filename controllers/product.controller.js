@@ -13,7 +13,45 @@ CREATE PRODUCT
 exports.createProduct = async (req, res) => {
 
   try {
+// =========================
+// REQUIRED VALIDATIONS
+// =========================
 
+if (!req.body.name?.trim()) {
+  return res.status(400).json({
+    success: false,
+    message: "Product name is required"
+  });
+}
+
+if (!req.body.category) {
+  return res.status(400).json({
+    success: false,
+    message: "Category is required"
+  });
+}
+
+if (!req.body.subCategory) {
+  return res.status(400).json({
+    success: false,
+    message: "Sub Category is required"
+  });
+}
+
+if (!req.body.productType) {
+  return res.status(400).json({
+    success: false,
+    message: "Product type is required"
+  });
+}
+
+if (!req.body.description?.trim()) {
+  return res.status(400).json({
+    success: false,
+    message: "Description is required"
+  });
+}
+    
     let imageUrls = [];
     let certificateUrl = "";
     let videoUrl = "";
@@ -47,6 +85,12 @@ exports.createProduct = async (req, res) => {
         imageUrls.push(result.secure_url);
       }
     }
+    if (imageUrls.length === 0) {
+  return res.status(400).json({
+    success: false,
+    message: "At least one product image is required"
+  });
+}
 
     // =========================
     // CERTIFICATE UPLOAD
@@ -123,6 +167,61 @@ exports.createProduct = async (req, res) => {
         ? JSON.parse(req.body.variants)
         : [];
 
+        if (!variants.length) {
+  return res.status(400).json({
+    success: false,
+    message: "At least one variant is required"
+  });
+}
+
+for (const variant of variants) {
+
+  if (!variant.sku?.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "SKU is required"
+    });
+  }
+
+  if (
+    variant.stock === undefined ||
+    variant.stock === null
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: `Stock is required for SKU '${variant.sku}'`
+    });
+  }
+
+  if (!variant.metalType) {
+    return res.status(400).json({
+      success: false,
+      message: `Metal type is required for SKU '${variant.sku}'`
+    });
+  }
+
+  if (!variant.metalPurity) {
+    return res.status(400).json({
+      success: false,
+      message: `Metal purity is required for SKU '${variant.sku}'`
+    });
+  }
+
+  if (!variant.grossWeight) {
+    return res.status(400).json({
+      success: false,
+      message: `Gross weight is required for SKU '${variant.sku}'`
+    });
+  }
+
+  if (!variant.netWeight) {
+    return res.status(400).json({
+      success: false,
+      message: `Net weight is required for SKU '${variant.sku}'`
+    });
+  }
+}
+
     // =========================
     // PARSE TAGS
     // =========================
@@ -140,6 +239,65 @@ exports.createProduct = async (req, res) => {
       req.body.metaKeywords
         ? JSON.parse(req.body.metaKeywords)
         : [];
+
+        // =========================
+// UNIQUE VALIDATIONS
+// =========================
+
+// SLUG
+
+if (req.body.slug) {
+
+  const existingSlug =
+    await Product.findOne({
+      slug: req.body.slug.trim()
+    });
+
+  if (existingSlug) {
+    return res.status(409).json({
+      success: false,
+      message: `Slug '${req.body.slug}' already exists`
+    });
+  }
+}
+
+// HALLMARK
+
+if (req.body.hallmarkNumber) {
+
+  const existingHallmark =
+    await Product.findOne({
+      hallmarkNumber:
+        req.body.hallmarkNumber.trim()
+    });
+
+  if (existingHallmark) {
+    return res.status(409).json({
+      success: false,
+      message:
+        `Hallmark Number '${req.body.hallmarkNumber}' already exists`
+    });
+  }
+}
+
+// SKU
+
+for (const variant of variants) {
+
+  const existingSku =
+    await Product.findOne({
+      "variants.sku":
+        variant.sku.trim()
+    });
+
+  if (existingSku) {
+    return res.status(409).json({
+      success: false,
+      message:
+        `SKU '${variant.sku}' already exists`
+    });
+  }
+}
 
     // =========================
     // PRODUCT CREATE
@@ -240,18 +398,31 @@ exports.createProduct = async (req, res) => {
 
   } catch (error) {
 
-    console.error(error);
+  console.error(error);
 
-    res.status(500).json({
+  if (error.code === 11000) {
 
+    const field =
+      Object.keys(error.keyValue)[0];
+
+    const value =
+      error.keyValue[field];
+
+    return res.status(409).json({
       success: false,
-
       message:
-        error.message
-
+        `${field} '${value}' already exists`
     });
 
   }
+
+  res.status(500).json({
+    success: false,
+    message:
+      error.message
+  });
+
+}
 
 };
 // exports.createProduct = async (req, res) => {

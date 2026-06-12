@@ -1,164 +1,87 @@
 const Category = require("../models/category");
 const cloudinary = require("../cloudinaryconfig");
 
-
 /*
- CREATE CATEGORY
+=================================
+CREATE CATEGORY
+=================================
 */
-exports.createCategory =
-async (req, res) => {
-
+exports.createCategory = async (req, res) => {
   try {
 
-    console.log(
-      "BODY:",
-      req.body
-    );
+    const { name, isActive } = req.body;
 
-    console.log(
-      "FILE:",
-      req.file
-    );
-
-    const {
-
-      name,
-
-      isActive
-
-    } = req.body;
-
-    // VALIDATION
-
+    // Validation
     if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Category name is required"
+      });
+    }
 
-      return res
-        .status(400)
-        .json({
+    // Duplicate Check
+    const existingCategory = await Category.findOne({
+      name: {
+        $regex: new RegExp(`^${name.trim()}$`, "i")
+      }
+    });
 
-          success: false,
-
-          message:
-            "Category name is required"
-
-        });
-
+    if (existingCategory) {
+      return res.status(400).json({
+        success: false,
+        message: "Category already exists"
+      });
     }
 
     let imageUrl = "";
 
-    // IMAGE UPLOAD
+    // Upload Image
+    if (req.file) {
 
-   if (req.file) {
+      const result = await new Promise(
+        (resolve, reject) => {
 
-  const result =
-    await new Promise(
-
-      (
-        resolve,
-        reject
-      ) => {
-
-        cloudinary
-          .uploader
-          .upload_stream(
-
+          cloudinary.uploader.upload_stream(
             {
-              folder:
-                "categories"
+              folder: "categories"
             },
-
-            (
-              error,
-              result
-            ) => {
+            (error, result) => {
 
               if (error)
                 reject(error);
-
               else
                 resolve(result);
 
             }
+          ).end(req.file.buffer);
 
-          )
+        }
+      );
 
-          .end(
-            req.file.buffer
-          );
+      imageUrl = result.secure_url;
+    }
 
-      }
-
-    );
-
-  imageUrl =
-    result.secure_url;
-
-}
-
-    // CREATE CATEGORY
-
-    const category =
-      await Category.create({
-
-        name,
-
-        image:
-          imageUrl,
-
-        isActive
-
-      });
-
-    // RESPONSE
+    const category = await Category.create({
+      name: name.trim(),
+      image: imageUrl,
+      isActive
+    });
 
     res.status(201).json({
-
       success: true,
-
-      message:
-        "Category created successfully",
-
-      data:
-        category
-
+      message: "Category created successfully",
+      data: category
     });
 
   } catch (error) {
 
-    console.log(error);
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Category already exists"
+      });
+    }
 
-    res.status(500).json({
-
-      success: false,
-
-      message:
-        error.message
-
-    });
-
-  }
-
-};
-
-
-
-/*
- GET ALL CATEGORY
-*/
-exports.getAllCategories = async (req, res) => {
-  try {
-
-    const categories =
-      await Category.find();
-
-    res.status(200).json({
-      success: true,
-      message: "Categories fetched successfully",
-      data: categories
-    });
-
-  } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message
@@ -167,15 +90,44 @@ exports.getAllCategories = async (req, res) => {
 };
 
 
+/*
+=================================
+GET ALL CATEGORIES
+=================================
+*/
+exports.getAllCategories = async (req, res) => {
+  try {
+
+    const categories = await Category.find();
+
+    res.status(200).json({
+      success: true,
+      message: "Categories fetched successfully",
+      data: categories
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};
+
 
 /*
- GET SINGLE CATEGORY
+=================================
+GET CATEGORY BY ID
+=================================
 */
 exports.getCategoryById = async (req, res) => {
   try {
 
-    const category =
-      await Category.findById(req.params.id);
+    const category = await Category.findById(
+      req.params.id
+    );
 
     if (!category) {
       return res.status(404).json({
@@ -191,23 +143,27 @@ exports.getCategoryById = async (req, res) => {
     });
 
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message
     });
+
   }
 };
 
 
-
 /*
- UPDATE CATEGORY
+=================================
+UPDATE CATEGORY
+=================================
 */
 exports.updateCategory = async (req, res) => {
   try {
 
-    const category =
-      await Category.findById(req.params.id);
+    const category = await Category.findById(
+      req.params.id
+    );
 
     if (!category) {
       return res.status(404).json({
@@ -218,45 +174,151 @@ exports.updateCategory = async (req, res) => {
 
     const { name, isActive } = req.body;
 
+    // ==========================
+    // DUPLICATE CHECK
+    // ==========================
+
+    if (name && name.trim()) {
+
+      const existingCategory =
+        await Category.findOne({
+
+          name: {
+            $regex: new RegExp(
+              `^${name.trim()}$`,
+              "i"
+            )
+          },
+
+          _id: {
+            $ne: req.params.id
+          }
+
+        });
+
+      if (existingCategory) {
+
+        return res.status(409).json({
+
+          success: false,
+
+          message:
+            `Category '${name}' already exists. Please use a different category name.`
+
+        });
+
+      }
+
+    }
+
+    // ==========================
+    // IMAGE UPLOAD
+    // ==========================
+
     let imageUrl = category.image;
 
     if (req.file) {
+
       const result =
-        await cloudinary.uploader.upload(
-          req.file.path
+        await new Promise(
+          (resolve, reject) => {
+
+            cloudinary.uploader.upload_stream(
+
+              {
+                folder: "categories"
+              },
+
+              (error, result) => {
+
+                if (error)
+                  reject(error);
+
+                else
+                  resolve(result);
+
+              }
+
+            ).end(
+              req.file.buffer
+            );
+
+          }
         );
 
-      imageUrl = result.secure_url;
+      imageUrl =
+        result.secure_url;
+
     }
 
-    category.name =
-      name || category.name;
+    // ==========================
+    // UPDATE DATA
+    // ==========================
 
-    category.image = imageUrl;
+    category.name =
+      name?.trim() ||
+      category.name;
+
+    category.image =
+      imageUrl;
 
     category.isActive =
-      isActive ?? category.isActive;
+      isActive ??
+      category.isActive;
 
     await category.save();
 
     res.status(200).json({
+
       success: true,
-      message: "Category updated successfully",
-      data: category
+
+      message:
+        "Category updated successfully",
+
+      data:
+        category
+
     });
 
   } catch (error) {
+
+    console.error(
+      "Update Category Error:",
+      error
+    );
+
+    if (
+      error.code === 11000
+    ) {
+
+      return res.status(409).json({
+
+        success: false,
+
+        message:
+          "Category already exists. Please use a different category name."
+
+      });
+
+    }
+
     res.status(500).json({
+
       success: false,
-      message: error.message
+
+      message:
+        error.message
+
     });
+
   }
 };
 
 
-
 /*
- DELETE CATEGORY
+=================================
+DELETE CATEGORY
+=================================
 */
 exports.deleteCategory = async (req, res) => {
   try {
@@ -279,9 +341,11 @@ exports.deleteCategory = async (req, res) => {
     });
 
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message
     });
+
   }
 };

@@ -8,7 +8,7 @@ const router = express.Router();
 const { register, login, forgotPassword, resetPassword } = require('../controllers/user.controller');
 const { createGoldRate, getAllGoldRates, getGoldRateById, updateGoldRate, deleteGoldRate } = require("../controllers/goldrate.controller");
 const { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory } = require("../controllers/category.controller");
-const { getSubCategoryByCategory, createSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory, deleteSubCategory } = require("../controllers/subcategory.controller");
+const { getSubCategoryByCategory, createSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory , deleteSubCategory } = require("../controllers/subcategory.controller");
 const { getSubSubCategoryBySubCategory, createSubSubCategory, getAllSubSubCategories, getSubSubCategoryById, updateSubSubCategory, deleteSubSubCategory } = require("../controllers/subsubcategory.controller");
 const { createProduct, getAllProducts, getAllProductsWithPagination, getProductsByType, getProductById, updateProduct, deleteProduct, getProductsByCategory, getProductsByCategoryId } = require("../controllers/product.controller");
 const { getAllUsers, getUsersCount, getProfileSummary, userLogout, Userregister, userLogin, userforgotPassword, verifyOTP, resendOTP, userresetPassword } = require("../controllers/userlogin.controller");
@@ -58,7 +58,7 @@ router.delete("/deletecategory/:id", deleteCategory);
 router.post("/Cretesubcategory", upload.single("image"), createSubCategory);
 router.get("/getbyIdsubcategory/:id", getSubCategoryById);
 router.get("/Getsubcategory", getAllSubCategories);
-router.put("/Updatesubcategory/:id", upload.single("image"), updateSubCategory);
+router.put("/Updatesubcategory/:id", upload.single("image"),updateSubCategory);
 router.delete("/Deletesubcategory/:id", deleteSubCategory);
 router.get("/get-subcategoryby-category/:categoryId", getSubCategoryByCategory);
 

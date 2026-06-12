@@ -1,5 +1,7 @@
 const SubSubCategory = require("../models/sub-sub-category");
 const cloudinary = require("../cloudinaryconfig");
+const mongoose =
+  require("mongoose");
 
 
 /*
@@ -8,110 +10,86 @@ CREATE SUB SUB CATEGORY
 =====================================
 */
 
-exports.createSubSubCategory =
-async (req, res) => {
+exports.createSubSubCategory = async (req, res) => {
 
   try {
 
-    console.log(
-      "BODY:",
-      req.body
-    );
-
-    console.log(
-      "FILE:",
-      req.file
-    );
-
     const {
-
       name,
-
       category,
-
       subCategory,
-
       isActive
-
     } = req.body;
 
-    // =========================
     // VALIDATION
-    // =========================
 
-    if (
+    if (!name || !category || !subCategory) {
 
-      !name ||
+      return res.status(400).json({
 
-      !category ||
+        success: false,
 
-      !subCategory
+        message:
+          "Name, Category and SubCategory are required"
 
-    ) {
-
-      return res
-        .status(400)
-        .json({
-
-          success: false,
-
-          message:
-            "Name, Category and SubCategory are required"
-
-        });
+      });
 
     }
 
-    // =========================
-    // IMAGE URL
-    // =========================
+    // DUPLICATE CHECK
+
+    const existingSubSubCategory =
+      await SubSubCategory.findOne({
+
+        name: {
+          $regex: new RegExp(
+            `^${name.trim()}$`,
+            "i"
+          )
+        }
+
+      });
+
+    if (existingSubSubCategory) {
+
+      return res.status(409).json({
+
+        success: false,
+
+        message:
+          `SubSubCategory '${name}' already exists. Please use a different name.`
+
+      });
+
+    }
 
     let imageUrl = "";
-
-    // =========================
-    // CLOUDINARY UPLOAD
-    // =========================
 
     if (req.file) {
 
       const result =
         await new Promise(
+          (resolve, reject) => {
 
-          (
-            resolve,
-            reject
-          ) => {
+            cloudinary.uploader.upload_stream(
 
-            cloudinary
-              .uploader
-              .upload_stream(
+              {
+                folder: "subsubcategory"
+              },
 
-                {
-                  folder:
-                    "subsubcategory"
-                },
+              (error, result) => {
 
-                (
-                  error,
-                  result
-                ) => {
+                if (error)
+                  reject(error);
 
-                  if (error)
-                    reject(error);
+                else
+                  resolve(result);
 
-                  else
-                    resolve(result);
+              }
 
-                }
-
-              )
-
-              .end(
-                req.file.buffer
-              );
+            ).end(req.file.buffer);
 
           }
-
         );
 
       imageUrl =
@@ -119,17 +97,12 @@ async (req, res) => {
 
     }
 
-    // =========================
-    // CREATE SUBSUBCATEGORY
-    // =========================
-
     const subSubCategory =
       await SubSubCategory.create({
 
-        name,
+        name: name.trim(),
 
-        image:
-          imageUrl,
+        image: imageUrl,
 
         category,
 
@@ -138,10 +111,6 @@ async (req, res) => {
         isActive
 
       });
-
-    // =========================
-    // RESPONSE
-    // =========================
 
     res.status(201).json({
 
@@ -157,7 +126,18 @@ async (req, res) => {
 
   } catch (error) {
 
-    console.log(error);
+    if (error.code === 11000) {
+
+      return res.status(409).json({
+
+        success: false,
+
+        message:
+          "SubSubCategory already exists. Please use a different name."
+
+      });
+
+    }
 
     res.status(500).json({
 
@@ -237,17 +217,25 @@ exports.getSubSubCategoryById = async (req, res) => {
  UPDATE SUB SUB CATEGORY
 */
 exports.updateSubSubCategory = async (req, res) => {
+
   try {
+
     const subSubCategory =
       await SubSubCategory.findById(
         req.params.id
       );
 
     if (!subSubCategory) {
+
       return res.status(404).json({
+
         success: false,
-        message: "SubSubCategory not found"
+
+        message:
+          "SubSubCategory not found"
+
       });
+
     }
 
     const {
@@ -257,47 +245,191 @@ exports.updateSubSubCategory = async (req, res) => {
       isActive
     } = req.body;
 
+    // CATEGORY VALIDATION
+
+    if (
+      category &&
+      !mongoose.Types.ObjectId.isValid(
+        category
+      )
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "Invalid Category selected."
+
+      });
+
+    }
+
+    // SUBCATEGORY VALIDATION
+
+    if (
+      subCategory &&
+      !mongoose.Types.ObjectId.isValid(
+        subCategory
+      )
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "Invalid SubCategory selected."
+
+      });
+
+    }
+
+    // DUPLICATE CHECK
+
+    if (
+      name &&
+      name.trim()
+    ) {
+
+      const existingSubSubCategory =
+        await SubSubCategory.findOne({
+
+          name: {
+            $regex: new RegExp(
+              `^${name.trim()}$`,
+              "i"
+            )
+          },
+
+          _id: {
+            $ne: req.params.id
+          }
+
+        });
+
+      if (existingSubSubCategory) {
+
+        return res.status(409).json({
+
+          success: false,
+
+          message:
+            `SubSubCategory '${name}' already exists. Please use a different name.`
+
+        });
+
+      }
+
+    }
+
     let imageUrl =
       subSubCategory.image;
 
     if (req.file) {
+
       const result =
-        await cloudinary.uploader.upload(
-          req.file.path
+        await new Promise(
+          (resolve, reject) => {
+
+            cloudinary.uploader.upload_stream(
+
+              {
+                folder: "subsubcategory"
+              },
+
+              (error, result) => {
+
+                if (error)
+                  reject(error);
+
+                else
+                  resolve(result);
+
+              }
+
+            ).end(req.file.buffer);
+
+          }
         );
 
-      imageUrl = result.secure_url;
+      imageUrl =
+        result.secure_url;
+
     }
 
     subSubCategory.name =
-      name || subSubCategory.name;
+      name?.trim() ||
+      subSubCategory.name;
 
     subSubCategory.category =
-      category || subSubCategory.category;
+      category ||
+      subSubCategory.category;
 
     subSubCategory.subCategory =
-      subCategory || subSubCategory.subCategory;
+      subCategory ||
+      subSubCategory.subCategory;
 
     subSubCategory.image =
       imageUrl;
 
     subSubCategory.isActive =
-      isActive ?? subSubCategory.isActive;
+      isActive ??
+      subSubCategory.isActive;
 
     await subSubCategory.save();
 
     res.status(200).json({
+
       success: true,
-      message: "SubSubCategory updated successfully",
-      data: subSubCategory
+
+      message:
+        "SubSubCategory updated successfully",
+
+      data:
+        subSubCategory
+
     });
 
   } catch (error) {
+
+    if (error.code === 11000) {
+
+      return res.status(409).json({
+
+        success: false,
+
+        message:
+          "SubSubCategory already exists. Please use a different name."
+
+      });
+
+    }
+
+    if (error.name === "CastError") {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "Invalid Category or SubCategory selected."
+
+      });
+
+    }
+
     res.status(500).json({
+
       success: false,
-      message: error.message
+
+      message:
+        error.message
+
     });
+
   }
+
 };
 
 

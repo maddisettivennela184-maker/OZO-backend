@@ -6,12 +6,15 @@ const variantSchema = new mongoose.Schema({
   },
 
   sku: {
-    type: String
+    type: String,
+    required: [true, "SKU is required"],
+  unique: true
   },
 
   stock: {
     type: Number,
-    default: 0
+    default: 0,
+    required: [true, "Stock is required"]
   },
 
   // =========================
@@ -21,12 +24,12 @@ const variantSchema = new mongoose.Schema({
   metalType: {
     type: String,
     enum: ["gold", "silver", "platinum"],
-    required: true
+   required: [true, "Metal type is required"]
   },
 
   metalPurity: {
     type: String,
-    required: true
+    required: [true, "Metal purity is required"]
   },
 
   metalColor: {
@@ -36,12 +39,12 @@ const variantSchema = new mongoose.Schema({
 
   grossWeight: {
     type: Number,
-    required: true
+    required: [true, "Gross weight is required"]
   },
 
   netWeight: {
     type: Number,
-    required: true
+    required: [true, "Net weight is required"]
   },
 
   wastagePercentage: {
@@ -127,7 +130,7 @@ const productSchema = new mongoose.Schema({
 
   name: {
     type: String,
-    required: true,
+     required: [true, "Product name is required"],
     trim: true
   },
 
@@ -143,17 +146,19 @@ const productSchema = new mongoose.Schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
-    required: true
+     required: [true, "  Category name is required"]
   },
 
   subCategory: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "SubCategory"
+    ref: "SubCategory",
+     required: [true, "subCategory name is required"]
   },
 
   subSubCategory: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "SubSubCategory"
+    ref: "SubSubCategory",
+     required: [true, "subsub Category name is required"]
   },
 
 
@@ -172,7 +177,7 @@ const productSchema = new mongoose.Schema({
       "silver_gemstone",
       "platinum_gemstone"
     ],
-    required: true
+    required: [true, "Product type name is required"]
   },
 
   gender: {
@@ -194,11 +199,13 @@ const productSchema = new mongoose.Schema({
 
   hallmarkCertified: {
     type: Boolean,
-    default: true
+    default: true,
+    
   },
 
   hallmarkNumber: {
-    type: String
+    type: String,
+      unique: true,
   },
 
   certificationIncluded: {
@@ -234,7 +241,9 @@ const productSchema = new mongoose.Schema({
   variants: [variantSchema],
 
   images: [{
-    type: String
+    type: String,
+        required: [true, "image name is required"]
+
   }],
 
   video: {

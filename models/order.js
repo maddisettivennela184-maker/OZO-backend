@@ -1,381 +1,279 @@
 const mongoose = require("mongoose");
 
+const orderItemSchema = new mongoose.Schema({
 
-// =========================
-// ORDER ITEM SCHEMA
-// =========================
+  // ======================
+  // PRODUCT REFERENCE
+  // ======================
 
-const orderItemSchema =
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+    required: true
+  },
 
-    new mongoose.Schema({
+  variant: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
 
-        product: {
+  // ======================
+  // PRODUCT SNAPSHOT
+  // ======================
 
-            type:
-                mongoose.Schema.Types.ObjectId,
+  productSnapshot: {
 
-            ref: "Product",
+    name: {
+      type: String,
+      required: true
+    },
 
-            required: true
+    slug: String,
 
-        },
+    image: String,
 
-        variantId: {
+    category: String,
 
-            type:
-                mongoose.Schema.Types.ObjectId,
+    subCategory: String
 
-            required: true
+  },
 
-        },
+  // ======================
+  // VARIANT SNAPSHOT
+  // ======================
 
-        quantity: {
+  variantSnapshot: {
 
-            type: Number,
+    sku: String,
 
-            default: 1
+    purity: String,
 
-        },
+    size: String,
 
-        // =========================
-        // PRODUCT SNAPSHOT
-        // =========================
+    grossWeight: Number,
 
-        name: {
-            type: String
-        },
+    netWeight: Number,
 
-        image: {
-            type: String
-        },
+    stoneWeight: Number,
 
-        productType: {
-            type: String
-        },
+    diamondWeight: Number,
 
-        category: {
-            type: String
-        },
+    makingCharge: Number,
 
-        // =========================
-        // VARIANT SNAPSHOT
-        // =========================
+    stoneType: String,
 
-        size: {
-            type: String
-        },
+    gender: String
 
-        goldPurity: {
-            type: String
-        },
+  },
 
-        goldColor: {
-            type: String
-        },
+  // ======================
+  // PRICE SNAPSHOT
+  // ======================
 
-        grossWeight: {
-            type: Number
-        },
+  pricingSnapshot: {
 
-        netWeight: {
-            type: Number
-        },
+    goldRate: Number,
 
-        makingCharges: {
-            type: Number
-        },
+    goldValue: Number,
 
-        wastagePercentage: {
-            type: Number
-        },
+    diamondValue: Number,
 
-        hasDiamond: {
-            type: Boolean,
-            default: false
-        },
+    stoneValue: Number,
 
-        diamonds: [
-            {
-                diamondType: String,
-                shape: String,
-                carat: Number,
-                color: String,
-                clarity: String,
-                cut: String,
-                certificateLab: String,
-                certificateNumber: String,
-                diamondPrice: Number,
-                totalDiamonds: Number
-            }
-        ],
+    makingCharge: Number,
 
-        // =========================
-        // PRICE SNAPSHOT
-        // =========================
+    gstAmount: Number
 
-        goldRatePerGram: {
-            type: Number
-        },
+  },
 
-        goldCost: {
-            type: Number
-        },
+  quantity: {
+    type: Number,
+    default: 1
+  },
 
-        totalDiamondPrice: {
-            type: Number
-        },
+  unitPrice: {
+    type: Number,
+    required: true
+  },
 
-        totalPrice: {
-            type: Number
-        },
+  totalPrice: {
+    type: Number,
+    required: true
+  }
 
-        discountPercentage: {
-            type: Number
-        },
+}, {
+  _id: false
+});
 
-        discountAmount: {
-            type: Number
-        },
+const orderSchema = new mongoose.Schema({
 
-        finalPrice: {
-            type: Number
-        }
+  // ======================
+  // ORDER DETAILS
+  // ======================
 
-    }, {
-        _id: false
-    });
+  orderNumber: {
+    type: String,
+    unique: true,
+    required: true
+  },
 
-// =========================
-// ADDRESS SCHEMA
-// =========================
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
 
-const addressSchema =
+  items: {
+    type: [orderItemSchema],
+    required: true
+  },
 
-    new mongoose.Schema({
+  // ======================
+  // SHIPPING ADDRESS
+  // ======================
 
-        fullName: {
-            type: String
-        },
+  address: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Address",
+    required: true
+  },
 
-        mobile: {
-            type: String
-        },
+  addressSnapshot: {
 
-        alternateMobile: {
-            type: String
-        },
+    fullName: String,
+
+    phone: String,
+
+    alternatePhone: String,
+
+    addressLine1: String,
+
+    addressLine2: String,
+
+    landmark: String,
+
+    city: String,
+
+    state: String,
 
-        houseNo: {
-            type: String
-        },
+    country: String,
 
-        area: {
-            type: String
-        },
+    postalCode: String
 
-        landmark: {
-            type: String
-        },
+  },
 
-        city: {
-            type: String
-        },
+  // ======================
+  // PAYMENT
+  // ======================
 
-        state: {
-            type: String
-        },
+  paymentMethod: {
+    type: String,
+    enum: [
+      "COD",
+      "ONLINE",
+      "UPI",
+      "CARD",
+      "NETBANKING"
+    ],
+    required: true
+  },
 
-        pincode: {
-            type: String
-        },
+  paymentStatus: {
+    type: String,
+    enum: [
+      "Pending",
+      "Paid",
+      "Failed",
+      "Refunded"
+    ],
+    default: "Pending"
+  },
 
-        country: {
-            type: String,
-            default: "India"
-        }
+  transactionId: String,
 
-    }, {
-        _id: false
-    });
+  paymentGateway: String,
 
-// =========================
-// ORDER SCHEMA
-// =========================
+  paidAt: Date,
 
-const orderSchema =
+  // ======================
+  // PRICE SUMMARY
+  // ======================
 
-    new mongoose.Schema({
+  subTotal: {
+    type: Number,
+    required: true
+  },
 
-        // =========================
-        // USER
-        // =========================
+  discountAmount: {
+    type: Number,
+    default: 0
+  },
 
-        user: {
+  couponCode: String,
 
-            type:
-                mongoose.Schema.Types.ObjectId,
+  shippingCharge: {
+    type: Number,
+    default: 0
+  },
 
-            ref: "User",
+  gstAmount: {
+    type: Number,
+    default: 0
+  },
 
-            required: true
+  totalAmount: {
+    type: Number,
+    required: true
+  },
 
-        },
+  // ======================
+  // ORDER STATUS
+  // ======================
 
-        // =========================
-        // ORDER ID
-        // =========================
+  orderStatus: {
+    type: String,
+    enum: [
+      "Pending",
+      "Confirmed",
+      "Processing",
+      "Packed",
+      "Shipped",
+      "Out For Delivery",
+      "Delivered",
+      "Cancelled",
+      "Returned",
+      "Refunded"
+    ],
+    default: "Pending"
+  },
 
-        orderId: {
+  // ======================
+  // TRACKING
+  // ======================
 
-            type: String,
+  trackingNumber: String,
 
-            unique: true
+  courierPartner: String,
 
-        },
+  shippedAt: Date,
 
-        // =========================
-        // PRODUCTS
-        // =========================
+  deliveredAt: Date,
 
-        items: [
-            orderItemSchema
-        ],
+  expectedDeliveryDate: Date,
 
-        // =========================
-        // ADDRESS
-        // =========================
+  cancelReason: String,
 
-        shippingAddress:
-            addressSchema,
+  returnReason: String,
 
-        // =========================
-        // PAYMENT
-        // =========================
+  notes: String
 
-        paymentMethod: {
-
-            type: String,
-
-            enum: [
-                "COD",
-                "RAZORPAY",
-                "STRIPE",
-                "UPI"
-            ],
-
-            default: "COD"
-
-        },
-
-        paymentStatus: {
-
-            type: String,
-
-            enum: [
-                "PENDING",
-                "PAID",
-                "FAILED",
-                "REFUNDED"
-            ],
-
-            default: "PENDING"
-
-        },
-
-        transactionId: {
-
-            type: String
-        },
-
-        // =========================
-        // ORDER STATUS
-        // =========================
-
-        orderStatus: {
-
-            type: String,
-
-            enum: [
-
-                "PLACED",
-
-                "CONFIRMED",
-
-                "PROCESSING",
-
-                "SHIPPED",
-
-                "OUT_FOR_DELIVERY",
-
-                "DELIVERED",
-
-                "CANCELLED"
-
-            ],
-
-            default: "PLACED"
-
-        },
-
-        // =========================
-        // PRICE SUMMARY
-        // =========================
-
-        subtotal: {
-
-            type: Number,
-
-            default: 0
-
-        },
-
-        shippingCharge: {
-
-            type: Number,
-
-            default: 0
-
-        },
-
-        discount: {
-
-            type: Number,
-
-            default: 0
-
-        },
-
-        totalAmount: {
-
-            type: Number,
-
-            default: 0
-
-        },
-
-        // =========================
-        // DELIVERY
-        // =========================
-
-        estimatedDeliveryDate: {
-            type: Date
-        },
-
-        deliveredAt: {
-            type: Date
-        }
-
-    }, {
-
-        timestamps: true
-
-    });
+}, {
+  timestamps: true
+});
 
 module.exports =
-
-    mongoose.models.Order ||
-
-    mongoose.model(
-        "Order",
-        orderSchema
-    );
+  mongoose.models.Order ||
+  mongoose.model(
+    "Order",
+    orderSchema
+  );

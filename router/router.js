@@ -21,6 +21,7 @@ const { createCoupon, getAllCoupons, getCouponById, updateCoupon, deleteCoupon }
 const { createReview, getAllReviews, getReviewById, getProductReviews, updateReview, deleteReview } = require("../controllers/review.controller");
 const { createMetalRate, getAllMetalRates, getMetalRateById, updateMetalRate, deleteMetalRate, toggleMetalRateStatus } = require("../controllers/metal-rate.controller");
 const { createStoneRate, getAllStoneRates, getStoneRateById, updateStoneRate, deleteStoneRate, toggleStoneRateStatus } = require("../controllers/stone-rate.controller");
+const {createOrder,getAllOrders,getOrderById,getOrdersByUser,updateOrderStatus,updatePaymentStatus,cancelOrder,deleteOrder} = require("../controllers/order.controller");
 
 const { createSizeChart, getAllSizeCharts, getSizeChartBySubCategory, updateSizeChart, deleteSizeChart } = require("../controllers/size-chart.controller");
 const upload = require("../middleware/upload");
@@ -170,5 +171,14 @@ router.get("/get-all-size-charts", getAllSizeCharts);
 router.get("/get-size-chart-by-sub-category/:subCategoryId", getSizeChartBySubCategory);
 router.put("/update-size-chart/:id", upload.single("image"), updateSizeChart);
 router.delete("/delete-size-chart/:id", deleteSizeChart);
+
+router.post("/create-order",createOrder);
+router.get("/get-all-orders",getAllOrders);
+router.get("/get-order/:id",getOrderById);
+router.get("/get-orders-by-user/:userId",getOrdersByUser);
+router.put("/update-order-status/:id",updateOrderStatus);
+router.put("/update-payment-status/:id",updatePaymentStatus);
+router.put("/cancel-order/:id",cancelOrder);
+router.delete("/delete-order/:id",deleteOrder);
 
 module.exports = router;

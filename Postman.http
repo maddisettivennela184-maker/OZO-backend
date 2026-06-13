@@ -437,18 +437,6 @@ Content-Type: application/json
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ###
 POST http://localhost:3001/api/createMetalRate
 Content-Type: application/json
@@ -475,3 +463,42 @@ Content-Type: application/json
     "unit": "piece",
     "ratePerUnit": 1200
 }
+
+
+###
+POST http://localhost:3001/api/create-order
+Content-Type: application/json
+
+{
+  "orderNumber": "ORD1001",
+  "user": "69f6435c46e9fd840f071f61",
+  "address": "69f65a7f98a8c5a25c60d668",
+  "paymentMethod": "COD",
+  "subTotal": 84148.43,
+  "totalAmount": 84148.43,
+  "items": [
+    {
+      "product": "6a2bb7e2d2301fa636ccda30",
+      "variant": "6a2bc37ff79263ad81dc3169",
+
+      "productSnapshot": {
+        "name": "Gold Diamond Ring",
+        "slug": "gold-diamond-ring",
+        "image": "https://image-url.jpg",
+        "category": "Gold Jewellery",
+        "subCategory": "Rings"
+      },
+
+      "quantity": 1,
+      "unitPrice": 84148.43,
+      "totalPrice": 84148.43
+    }
+  ]
+}
+
+###
+GET  http://localhost:3001/api/get-all-orders
+Content-Type: application/json
+
+
+

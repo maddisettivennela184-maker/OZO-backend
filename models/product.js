@@ -24,7 +24,6 @@ const variantSchema = new mongoose.Schema({
   metalType: {
     type: String,
     enum: ["gold", "silver", "platinum"],
-   required: [true, "Metal type is required"]
   },
 
   metalPurity: {

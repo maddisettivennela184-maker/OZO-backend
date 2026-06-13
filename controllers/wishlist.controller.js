@@ -127,33 +127,72 @@ exports.getWishlist = async (
 
     }
 
+    // =========================
+    // REMOVE INVALID ITEMS
+    // =========================
+
+    const validWishlistEntries = [];
+
+    for (const item of wishlist.items) {
+
+      const product =
+        item.product;
+
+      if (!product) {
+        continue;
+      }
+
+      const selectedVariant =
+
+        product.variants?.id(
+          item.variantId
+        );
+
+      if (!selectedVariant) {
+        continue;
+      }
+
+      validWishlistEntries.push(item);
+
+    }
+
+    // =========================
+    // AUTO CLEANUP
+    // =========================
+
+    if (
+
+      validWishlistEntries.length !==
+      wishlist.items.length
+
+    ) {
+
+      wishlist.items =
+        validWishlistEntries;
+
+      await wishlist.save();
+
+    }
+
+    // =========================
+    // PREPARE ITEMS
+    // =========================
+
     const wishlistItems =
 
       await Promise.all(
 
-        wishlist.items.map(
+        validWishlistEntries.map(
           async (item) => {
 
             const product =
               item.product;
-
-            if (!product) {
-              return null;
-            }
 
             const selectedVariant =
 
               product.variants.id(
                 item.variantId
               );
-
-            if (!selectedVariant) {
-              return null;
-            }
-
-            // =====================
-            // PRICE CALCULATION
-            // =====================
 
             const priceDetails =
 
@@ -199,11 +238,16 @@ exports.getWishlist = async (
             };
 
           }
+
         )
 
       );
 
-    res.status(200).json({
+    // =========================
+    // RESPONSE
+    // =========================
+
+    return res.status(200).json({
 
       success: true,
 
@@ -213,8 +257,11 @@ exports.getWishlist = async (
       wishlistId:
         wishlist._id.toString(),
 
+      wishlistCount:
+        wishlistItems.length,
+
       items:
-        wishlistItems.filter(Boolean)
+        wishlistItems
 
     });
 
@@ -222,7 +269,7 @@ exports.getWishlist = async (
 
     console.log(error);
 
-    res.status(500).json({
+    return res.status(500).json({
 
       success: false,
 
@@ -234,7 +281,6 @@ exports.getWishlist = async (
   }
 
 };
-
 exports.removeWishlistItem =
   async (req, res) => {
     try {

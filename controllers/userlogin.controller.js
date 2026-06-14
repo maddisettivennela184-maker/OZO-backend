@@ -466,7 +466,7 @@ exports.getProfileSummary = async (
     const user =
       await User.findById(userId)
         .select(
-          "name email mobile profileImage"
+          "name email phone profileImage"
         );
 
     if (!user) {
@@ -489,10 +489,55 @@ exports.getProfileSummary = async (
     const cart =
       await Cart.findOne({
         user: userId
-      });
+      })
+        .populate("items.product");
 
-    const cartCount =
-      cart?.items?.length || 0;
+    let cartCount = 0;
+
+    if (cart) {
+
+      const validCartItems = [];
+
+      for (const item of cart.items) {
+
+        const product =
+          item.product;
+
+        if (!product) {
+          continue;
+        }
+
+        const selectedVariant =
+          product.variants?.id(
+            item.variantId
+          );
+
+        if (!selectedVariant) {
+          continue;
+        }
+
+        validCartItems.push(item);
+
+      }
+
+      // Auto cleanup invalid items
+
+      if (
+        validCartItems.length !==
+        cart.items.length
+      ) {
+
+        cart.items =
+          validCartItems;
+
+        await cart.save();
+
+      }
+
+      cartCount =
+        validCartItems.length;
+
+    }
 
     // ======================
     // WISHLIST COUNT
@@ -519,7 +564,7 @@ exports.getProfileSummary = async (
     // RESPONSE
     // ======================
 
-    res.status(200).json({
+    return res.status(200).json({
 
       success: true,
 
@@ -536,8 +581,8 @@ exports.getProfileSummary = async (
           email:
             user.email,
 
-          mobile:
-            user.mobile,
+          phone:
+            user.phone,
 
           profileImage:
             user.profileImage || ''
@@ -563,7 +608,9 @@ exports.getProfileSummary = async (
 
   } catch (error) {
 
-    res.status(500).json({
+    console.log(error);
+
+    return res.status(500).json({
 
       success: false,
 
@@ -575,7 +622,6 @@ exports.getProfileSummary = async (
   }
 
 };
-
 
 /*
 LOGOUT

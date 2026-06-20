@@ -258,7 +258,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3001/api/getcart/69f4455430a4633b9cd12af6
+GET http://localhost:3001/api/getcart/6a1e7141c2aad3cac853ace3
 Content-Type: application/json
 
 
@@ -470,35 +470,67 @@ POST http://localhost:3001/api/create-order
 Content-Type: application/json
 
 {
-  "orderNumber": "ORD1001",
-  "user": "69f6435c46e9fd840f071f61",
+  "user": "6a32698734258cd3cea201d9",
+
   "address": "69f65a7f98a8c5a25c60d668",
+
   "paymentMethod": "COD",
+
   "subTotal": 84148.43,
+
+  "discountAmount": 0,
+
+  "shippingCharge": 0,
+
+  "gstAmount": 0,
+
   "totalAmount": 84148.43,
+
+  "notes": "Test Order",
+
   "items": [
     {
-      "product": "6a2bb7e2d2301fa636ccda30",
-      "variant": "6a2bc37ff79263ad81dc3169",
+      "product": "6a2e4af1359ecc08bd7680ce",
 
-      "productSnapshot": {
-        "name": "Gold Diamond Ring",
-        "slug": "gold-diamond-ring",
-        "image": "https://image-url.jpg",
-        "category": "Gold Jewellery",
-        "subCategory": "Rings"
-      },
+      "variant": "6a2e4af1359ecc08bd7680cf",
 
       "quantity": 1,
+
       "unitPrice": 84148.43,
+
       "totalPrice": 84148.43
     }
   ]
 }
 
+
+
 ###
 GET  http://localhost:3001/api/get-all-orders
 Content-Type: application/json
 
+###
+GET  http://localhost:3001/api/get-order/6a2d0acb45de70dcb49519fb
+Content-Type: application/json
 
+###
+GET  http://localhost:3001/api/get-orders-by-user/6a32698734258cd3cea201d9
+Content-Type: application/json
 
+###
+put http://localhost:3001/api/update-order-status/6a2d0acb45de70dcb49519fb
+Content-Type: application/json
+
+{
+  "orderStatus": "Shipped"
+}
+
+###
+put http://localhost:3001/api/update-payment-status/6a2d0acb45de70dcb49519fb
+
+###
+GET http://localhost:3001/api/get-all-ads
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/createAds

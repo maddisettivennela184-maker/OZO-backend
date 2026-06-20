@@ -1,59 +1,275 @@
 const Order = require("../models/order");
+const Product = require("../models/product");
+const User = require("../models/user-login");
+const Address = require("../models/address");
 
 exports.createOrder = async (req, res) => {
 
   try {
 
     const {
-      orderNumber,
       user,
-      items,
       address,
       paymentMethod,
+      items,
       subTotal,
-      totalAmount
+      discountAmount,
+      shippingCharge,
+      gstAmount,
+      totalAmount,
+      notes
     } = req.body;
 
-    if (!user) {
-      return res.status(400).json({
+    // =====================
+    // USER CHECK
+    // =====================
+
+   const userData =
+  await User.findOne({
+    _id: user
+  });
+
+console.log(userData);
+
+    if (!userData) {
+
+      return res.status(404).json({
+
         success: false,
-        message: "User is required"
+
+        message:
+          "User not found"
+
       });
+
     }
 
-    if (!items || items.length === 0) {
-      return res.status(400).json({
+    // =====================
+    // ADDRESS CHECK
+    // =====================
+
+    const addressData =
+      await Address.findById(address);
+
+    if (!addressData) {
+
+      return res.status(404).json({
+
         success: false,
-        message: "Order items are required"
+
+        message:
+          "Address not found"
+
       });
+
     }
 
-    const existingOrder =
-      await Order.findOne({
-        orderNumber
+    // =====================
+    // ORDER NUMBER
+    // =====================
+
+    const count =
+      await Order.countDocuments();
+
+    const orderNumber =
+      `ORD${1001 + count}`;
+
+    let orderItems = [];
+
+    // =====================
+    // ITEMS LOOP
+    // =====================
+
+    for (const item of items) {
+
+      const product =
+        await Product.findById(
+          item.product
+        );
+
+      if (!product) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Product not found"
+
+        });
+
+      }
+
+      const variant =
+        product.variants.find(
+
+          v =>
+            v._id.toString() ===
+            item.variant
+
+        );
+
+      if (!variant) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Variant not found"
+
+        });
+
+      }
+
+      orderItems.push({
+
+        product:
+          product._id,
+
+        variant:
+          variant._id,
+
+        productSnapshot: {
+
+          name:
+            product.name,
+
+          slug:
+            product.slug,
+
+          image:
+            product.images?.[0],
+
+          category:
+            product.category,
+
+          subCategory:
+            product.subCategory
+
+        },
+
+        variantSnapshot: {
+
+          sku:
+            variant.sku,
+
+          purity:
+            variant.metalPurity,
+
+          size:
+            variant.size,
+
+          grossWeight:
+            variant.grossWeight,
+
+          netWeight:
+            variant.netWeight,
+
+          makingCharge:
+            variant.makingCharges,
+
+          stoneType:
+            variant.stones?.[0]
+              ?.stoneType
+
+        },
+
+        quantity:
+          item.quantity,
+
+        unitPrice:
+          item.unitPrice,
+
+        totalPrice:
+          item.totalPrice
+
       });
 
-    if (existingOrder) {
-      return res.status(409).json({
-        success: false,
-        message: "Order Number already exists"
-      });
     }
+
+    // =====================
+    // CREATE ORDER
+    // =====================
 
     const order =
-      await Order.create(req.body);
+      await Order.create({
+
+        orderNumber,
+
+        user,
+
+        address,
+
+        paymentMethod,
+
+        items:
+          orderItems,
+
+        addressSnapshot: {
+
+          fullName:
+            addressData.fullName,
+
+          phone:
+            addressData.phone,
+
+          addressLine1:
+            addressData.addressLine1,
+
+          addressLine2:
+            addressData.addressLine2,
+
+          city:
+            addressData.city,
+
+          state:
+            addressData.state,
+
+          country:
+            addressData.country,
+
+          postalCode:
+            addressData.pincode
+
+        },
+
+        subTotal,
+
+        discountAmount,
+
+        shippingCharge,
+
+        gstAmount,
+
+        totalAmount,
+
+        notes
+
+      });
 
     res.status(201).json({
+
       success: true,
-      message: "Order created successfully",
-      data: order
+
+      message:
+        "Order created successfully",
+
+      data:
+        order
+
     });
 
-  } catch (error) {
+  }
+  catch (error) {
 
     res.status(500).json({
+
       success: false,
-      message: error.message
+
+      message:
+        error.message
+
     });
 
   }

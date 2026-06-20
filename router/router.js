@@ -24,6 +24,8 @@ const { createStoneRate, getAllStoneRates, getStoneRateById, updateStoneRate, de
 const {createOrder,getAllOrders,getOrderById,getOrdersByUser,updateOrderStatus,updatePaymentStatus,cancelOrder,deleteOrder} = require("../controllers/order.controller");
 
 const { createSizeChart, getAllSizeCharts, getSizeChartBySubCategory, updateSizeChart, deleteSizeChart } = require("../controllers/size-chart.controller");
+const {createAds,getAllAds,getAdsById,updateAds,deleteAds} = require("../controllers/adss.controller");
+
 const upload = require("../middleware/upload");
 
 const { uploadCertificate } = require("../controllers/upload.controller");
@@ -180,5 +182,31 @@ router.put("/update-order-status/:id",updateOrderStatus);
 router.put("/update-payment-status/:id",updatePaymentStatus);
 router.put("/cancel-order/:id",cancelOrder);
 router.delete("/delete-order/:id",deleteOrder);
+
+// router.post( "/create-ads", createAds);
+router.post(
+  "/createAds",
+  upload.fields([
+    { name: "section1Images", maxCount: 10 },
+    { name: "section2Images", maxCount: 10 },
+    { name: "section3Images", maxCount: 10 },
+    { name: "section4Images", maxCount: 10 },
+    { name: "section5Images", maxCount: 10 }
+  ]),
+  createAds
+);
+router.get("/get-all-ads",getAllAds);
+router.get("/get-ads/:id",getAdsById);
+router.put(
+  "/updateAds/:id",
+  upload.fields([
+    { name: "section1Images", maxCount: 10 },
+    { name: "section2Images", maxCount: 10 },
+    { name: "section3Images", maxCount: 10 },
+    { name: "section4Images", maxCount: 10 },
+    { name: "section5Images", maxCount: 10 }
+  ]),
+  updateAds
+);router.delete("/delete-ads/:id",deleteAds);
 
 module.exports = router;

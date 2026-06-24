@@ -1,25 +1,67 @@
 POST http://localhost:3001/api/register
 Content-Type: application/json
 
+# {
+#   "name": "Admin",
+#   "email": "admin@gmail.com",
+#   "password": "admin@123",
+#   "role": "ADMIN",
+#   "permissions": [
+#     "ADD_PRODUCT",
+#     "DELETE_PRODUCT"
+#   ]
+# }
 {
-  "name": "Admin",
-  "email": "admin@gmail.com",
-  "password": "admin@123",
-  "role": "ADMIN",
-  "permissions": [
-    "ADD_PRODUCT",
-    "DELETE_PRODUCT"
-  ]
+  "name": "Miyapur Branch",
+  "email": "miyapur@gmail.com",
+  "password": "miyapur123",
+  "role": "SUB_BRANCH",
+  "contactNumber": "9876543210",
+  "address": "Miyapur",
+  "location": "Hyderabad",
+  "branchId":"69f067f6ac6f3e806161afbe"
 }
+
+###
+GET http://localhost:3001/api/getSubBranchById/6a3a66084917d3584b12b4a4
+Content-Type: application/json
+delete-subbranch
+
+###
+DELETE http://localhost:3001/api/delete-subbranch/6a3a66084917d3584b12b4a4
+Content-Type: application/json
+
+
+###
+PUT  http://localhost:3001/api/update-subbranch/6a3a67947a81e7604d8a7184
+Content-Type: application/json
+
+{
+  "name": "hitech cirt Branch",
+  "email": "hitech@gmail.com",
+  "password": "hitech123",
+  "role": "SUB_BRANCH",
+  "contactNumber": "9876543210",
+  "address": "Miyapur",
+  "location": "Hyderabad",
+  "branchId":"69f067f6ac6f3e806161afbe"
+}
+
+
+###
+GET http://localhost:3001/api/get-all-subbranches
+Content-Type: application/json
 
 ###
 POST http://localhost:3001/api/login
 Content-Type: application/json
 
 {
-  "email": "admin@gmail.com",
-  "password": "admin123"
+  "email": "miyapur@gmail.com",
+  "password": "miyapur123"
 }
+
+
 
 ###
 POST http://localhost:3001/api/forgot-password
@@ -534,3 +576,21 @@ Content-Type: application/json
 
 ###
 POST http://localhost:3001/api/createAds
+
+###
+GET http://localhost:3001/api/get-ads/6a365737aae6950c5eb036cd
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-employee
+
+###
+GET http://localhost:3001/api/get-all-employees
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-employeebyid/6a3a933e3e273477e846fca3
+Content-Type: application/json
+
+###
+put http://localhost:3001/api/update-employee/6a3a933e3e273477e846fca3

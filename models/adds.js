@@ -12,9 +12,9 @@ const sectionSchema = new mongoose.Schema({
     required: true
   },
 
-  images: [{
-    type: String
-  }],
+ image: {
+  type: String
+},
 
   isActive: {
     type: Boolean,
@@ -38,17 +38,9 @@ const adsSchema = new mongoose.Schema({
   section3: {
     type: sectionSchema,
     default: null
-  },
-
-  section4: {
-    type: sectionSchema,
-    default: null
-  },
-
-  section5: {
-    type: sectionSchema,
-    default: null
   }
+
+ 
 
 }, {
   timestamps: true

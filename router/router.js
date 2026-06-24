@@ -5,7 +5,8 @@ const router = express.Router();
 
 
 
-const { register, login, forgotPassword, resetPassword } = require('../controllers/user.controller');
+
+const { register, login, forgotPassword, resetPassword,getAllSubBranches,updateSubBranch,getSubBranchById,deleteSubBranch,updateSubBranchStatus} = require('../controllers/user.controller');
 const { createGoldRate, getAllGoldRates, getGoldRateById, updateGoldRate, deleteGoldRate } = require("../controllers/goldrate.controller");
 const { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory } = require("../controllers/category.controller");
 const { getSubCategoryByCategory, createSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory , deleteSubCategory } = require("../controllers/subcategory.controller");
@@ -24,8 +25,23 @@ const { createStoneRate, getAllStoneRates, getStoneRateById, updateStoneRate, de
 const {createOrder,getAllOrders,getOrderById,getOrdersByUser,updateOrderStatus,updatePaymentStatus,cancelOrder,deleteOrder} = require("../controllers/order.controller");
 
 const { createSizeChart, getAllSizeCharts, getSizeChartBySubCategory, updateSizeChart, deleteSizeChart } = require("../controllers/size-chart.controller");
-const {createAds,getAllAds,getAdsById,updateAds,deleteAds} = require("../controllers/adss.controller");
+const {createAds,getAllAds,getAdsById,updateSection,deleteAds,updateAdsStatus} = require("../controllers/adss.controller");
+const {
+createEmployee,
 
+  getAllEmployees,
+
+  getEmployeeById,
+
+  updateEmployee,
+
+  updateEmployeeStatus,
+
+  deleteEmployee
+
+} = require(
+  '../controllers/employee.controller'
+);
 const upload = require("../middleware/upload");
 
 const { uploadCertificate } = require("../controllers/upload.controller");
@@ -43,6 +59,24 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
+router.get('/get-all-subbranches',getAllSubBranches);
+router.put(
+  '/update-subbranch/:id',
+  updateSubBranch
+);
+router.get(
+  '/getSubBranchById/:id',
+  getSubBranchById
+);
+router.delete(
+  '/delete-subbranch/:id',
+  deleteSubBranch
+);
+router.put(
+  '/update-subbranch-status/:id',
+  updateSubBranchStatus
+);
+
 
 // gold Rate
 
@@ -187,26 +221,81 @@ router.delete("/delete-order/:id",deleteOrder);
 router.post(
   "/createAds",
   upload.fields([
-    { name: "section1Images", maxCount: 10 },
-    { name: "section2Images", maxCount: 10 },
-    { name: "section3Images", maxCount: 10 },
-    { name: "section4Images", maxCount: 10 },
-    { name: "section5Images", maxCount: 10 }
+    { name: "section1Images", maxCount: 1 },
+    { name: "section2Images", maxCount: 1 },
+    { name: "section3Images", maxCount: 1 }
   ]),
-  createAds
+ createAds
 );
 router.get("/get-all-ads",getAllAds);
 router.get("/get-ads/:id",getAdsById);
 router.put(
-  "/updateAds/:id",
-  upload.fields([
-    { name: "section1Images", maxCount: 10 },
-    { name: "section2Images", maxCount: 10 },
-    { name: "section3Images", maxCount: 10 },
-    { name: "section4Images", maxCount: 10 },
-    { name: "section5Images", maxCount: 10 }
-  ]),
-  updateAds
-);router.delete("/delete-ads/:id",deleteAds);
+  "/updateSection/:id",
+  upload.single("image"),
+  updateSection
+);
+router.delete("/delete-ads/:id",deleteAds);
+router.put(
+  "/updateAdsStatus/:id",
+  updateAdsStatus
+);
 
+
+// CREATE
+
+router.post(
+
+  '/create-employee',
+
+  upload.fields([
+
+    {
+      name: 'photo',
+      maxCount: 1
+    },
+
+    {
+      name: 'aadhaarImage',
+      maxCount: 1
+    }
+
+  ]),
+
+  createEmployee
+
+);
+
+
+router.get(
+  '/get-all-employees',
+  getAllEmployees
+);
+
+router.get(
+  '/get-employeebyid/:id',
+  getEmployeeById
+);
+
+router.put(
+
+  '/update-employee/:id',
+
+  upload.fields([
+    {
+      name: 'photo',
+      maxCount: 1
+    },
+    {
+      name: 'aadhaarImage',
+      maxCount: 1
+    }
+  ]),
+
+  updateEmployee
+);
+
+router.delete(
+  '/delete-employee/:id',
+  deleteEmployee
+);
 module.exports = router;

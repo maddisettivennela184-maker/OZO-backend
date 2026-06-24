@@ -1,110 +1,100 @@
 const Ads = require("../models/adds");
 const cloudinary = require("../cloudinaryconfig");
-
 exports.createAds = async (req, res) => {
   try {
 
-    const uploadImages = async (files = []) => {
+    let section1Image = "";
+    let section2Image = "";
+    let section3Image = "";
 
-      const imageUrls = [];
+    if (req.files?.section1Images?.[0]) {
 
-      for (const file of files) {
+      const result = await new Promise((resolve, reject) => {
 
-        const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: "ads" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(req.files.section1Images[0].buffer);
 
-          cloudinary.uploader.upload_stream(
-            { folder: "ads" },
-            (error, result) => {
+      });
 
-              if (error) reject(error);
-              else resolve(result);
+      section1Image = result.secure_url;
+    }
 
-            }
-          ).end(file.buffer);
+    if (req.files?.section2Images?.[0]) {
 
-        });
+      const result = await new Promise((resolve, reject) => {
 
-        imageUrls.push(result.secure_url);
-      }
+        cloudinary.uploader.upload_stream(
+          { folder: "ads" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(req.files.section2Images[0].buffer);
 
-      return imageUrls;
-    };
+      });
 
-    const section1Images = await uploadImages(
-      req.files?.section1Images || []
-    );
+      section2Image = result.secure_url;
+    }
 
-    const section2Images = await uploadImages(
-      req.files?.section2Images || []
-    );
+    if (req.files?.section3Images?.[0]) {
 
-    const section3Images = await uploadImages(
-      req.files?.section3Images || []
-    );
+      const result = await new Promise((resolve, reject) => {
 
-    const section4Images = await uploadImages(
-      req.files?.section4Images || []
-    );
+        cloudinary.uploader.upload_stream(
+          { folder: "ads" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(req.files.section3Images[0].buffer);
 
-    const section5Images = await uploadImages(
-      req.files?.section5Images || []
-    );
+      });
+
+      section3Image = result.secure_url;
+    }
 
     const ads = await Ads.create({
 
-      section1: req.body.section1Title ? {
+      section1: {
         title: req.body.section1Title,
         description: req.body.section1Description,
-        images: section1Images,
-        isActive: req.body.section1IsActive || true
-      } : null,
+        image: section1Image
+      },
 
-      section2: req.body.section2Title ? {
+      section2: {
         title: req.body.section2Title,
         description: req.body.section2Description,
-        images: section2Images,
-        isActive: req.body.section2IsActive || true
-      } : null,
+        image: section2Image
+      },
 
-      section3: req.body.section3Title ? {
+      section3: {
         title: req.body.section3Title,
         description: req.body.section3Description,
-        images: section3Images,
-        isActive: req.body.section3IsActive || true
-      } : null,
-
-      section4: req.body.section4Title ? {
-        title: req.body.section4Title,
-        description: req.body.section4Description,
-        images: section4Images,
-        isActive: req.body.section4IsActive || true
-      } : null,
-
-      section5: req.body.section5Title ? {
-        title: req.body.section5Title,
-        description: req.body.section5Description,
-        images: section5Images,
-        isActive: req.body.section5IsActive || true
-      } : null
+        image: section3Image
+      }
 
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
-      message: "Ads Created Successfully",
+      message: "Ads created successfully",
       data: ads
     });
 
   } catch (error) {
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message
     });
 
   }
 };
-
 
 exports.getAllAds = async (
   req,
@@ -143,57 +133,37 @@ exports.getAllAds = async (
   }
 
 };
-exports.getAdsById = async (
-  req,
-  res
-) => {
-
+exports.getAdsById = async (req, res) => {
   try {
 
-    const ads =
-      await Ads.findById(
-        req.params.id
-      );
+    const ads = await Ads.findById(req.params.id);
 
     if (!ads) {
-
       return res.status(404).json({
-
         success: false,
-
-        message:
-          "Ads not found"
-
+        message: "Ads not found"
       });
-
     }
 
-    res.status(200).json({
-
+    return res.status(200).json({
       success: true,
-
       data: ads
-
     });
 
-  }
-  catch (error) {
+  } catch (error) {
 
-    res.status(500).json({
-
+    return res.status(500).json({
       success: false,
-
       message: error.message
-
     });
 
   }
-
 };
-exports.updateAds = async (req, res) => {
+exports.updateSection = async (req, res) => {
   try {
 
     const { id } = req.params;
+    const { section, title, description } = req.body;
 
     const ads = await Ads.findById(id);
 
@@ -204,105 +174,43 @@ exports.updateAds = async (req, res) => {
       });
     }
 
-    const uploadImages = async (files = []) => {
+    ads[section].title = title;
+    ads[section].description = description;
 
-      const imageUrls = [];
+    if (req.file) {
 
-      for (const file of files) {
+      const result = await new Promise((resolve, reject) => {
 
-        const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: "ads" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        ).end(req.file.buffer);
 
-          cloudinary.uploader.upload_stream(
-            { folder: "ads" },
-            (error, result) => {
+      });
 
-              if (error) reject(error);
-              else resolve(result);
-
-            }
-          ).end(file.buffer);
-
-        });
-
-        imageUrls.push(result.secure_url);
-      }
-
-      return imageUrls;
-    };
-
-    const sections = [
-      "section1",
-      "section2",
-      "section3",
-      "section4",
-      "section5"
-    ];
-
-    for (const section of sections) {
-
-      const title = req.body[`${section}Title`];
-      const description = req.body[`${section}Description`];
-      const isActive = req.body[`${section}IsActive`];
-
-      const uploadedImages = await uploadImages(
-        req.files?.[`${section}Images`] || []
-      );
-      const existingImages =
-  JSON.parse(
-    req.body[`${section}ExistingImages`] || "[]"
-  );
-
-      if (
-        title ||
-        description ||
-        isActive !== undefined ||
-        uploadedImages.length
-      ) {
-
-       ads[section] = {
-
-  title:
-    title ||
-    ads[section]?.title ||
-    "",
-
-  description:
-    description ||
-    ads[section]?.description ||
-    "",
-
-  images: [
-    ...existingImages,
-    ...uploadedImages
-  ],
-
-  isActive:
-    isActive !== undefined
-      ? isActive
-      : ads[section]?.isActive ?? true
-
-};
-
-      }
+      ads[section].image = result.secure_url;
     }
 
     await ads.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "Ads Updated Successfully",
+      message: `${section} updated successfully`,
       data: ads
     });
 
   } catch (error) {
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message
     });
 
   }
-};  
+};
 exports.deleteAds = async (
   req,
   res
@@ -345,6 +253,67 @@ exports.deleteAds = async (
       success: false,
 
       message: error.message
+
+    });
+
+  }
+
+};
+
+exports.updateAdsStatus = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const { id } =
+      req.params;
+
+    const {
+      section,
+      isActive
+    } = req.body;
+
+    const ads =
+      await Ads.findById(id);
+
+    if (!ads) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message:
+          "Ads not found"
+
+      });
+
+    }
+
+    ads[section].isActive =
+      isActive;
+
+    await ads.save();
+
+    return res.status(200).json({
+
+      success: true,
+
+      message:
+        "Status Updated Successfully"
+
+    });
+
+  }
+  catch (error) {
+
+    return res.status(500).json({
+
+      success: false,
+
+      message:
+        error.message
 
     });
 

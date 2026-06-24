@@ -19,8 +19,39 @@ const adminSchema = new mongoose.Schema({
 
   role: {
     type: String,
-    enum: ['ADMIN', 'SUB_ADMIN'],
-    default: 'SUB_ADMIN'
+    enum: ['BRANCH', 'SUB_BRANCH'],
+    default: 'SUB_BRANCH'
+  },
+
+   contactNumber: {
+    type: String,
+    default: ''
+  },
+
+  address: {
+    type: String,
+    default: ''
+  },
+
+  location: {
+    type: String,
+    default: ''
+  },
+
+  branchId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admin',
+    default: null
+  },
+
+  status: {
+    type: String,
+    enum: ['ACTIVE', 'INACTIVE'],
+    default: function () {
+      return this.role === 'BRANCH'
+        ? 'ACTIVE'
+        : 'INACTIVE';
+    }
   },
 
   permissions: {

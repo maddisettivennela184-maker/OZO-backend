@@ -12,14 +12,14 @@ Content-Type: application/json
 #   ]
 # }
 {
-  "name": "Miyapur Branch",
-  "email": "miyapur@gmail.com",
-  "password": "miyapur123",
+  "name": "kphb Branch",
+  "email": "kphb@gmail.com",
+  "password": "kphb123",
   "role": "SUB_BRANCH",
-  "contactNumber": "9876543210",
-  "address": "Miyapur",
+  "contactNumber": "9876543219",
+  "address": "kphb",
   "location": "Hyderabad",
-  "branchId":"69f067f6ac6f3e806161afbe"
+  "branchId":"6a3912d97c3f96315204b938"
 }
 
 ###
@@ -44,8 +44,12 @@ Content-Type: application/json
   "contactNumber": "9876543210",
   "address": "Miyapur",
   "location": "Hyderabad",
-  "branchId":"69f067f6ac6f3e806161afbe"
+  "branchId":"6a3912d97c3f96315204b938"
 }
+
+### 
+GET http://localhost:3001/api/get-branch-list
+Content-Type: application/json
 
 
 ###
@@ -57,8 +61,8 @@ POST http://localhost:3001/api/login
 Content-Type: application/json
 
 {
-  "email": "miyapur@gmail.com",
-  "password": "miyapur123"
+  "email": "admin@gmail.com",
+  "password": "admin123"
 }
 
 

@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 
-const { register, login, forgotPassword, resetPassword,getAllSubBranches,updateSubBranch,getSubBranchById,deleteSubBranch,updateSubBranchStatus} = require('../controllers/user.controller');
+const { register, login, forgotPassword, resetPassword,getAllSubBranches,updateSubBranch,getSubBranchById,deleteSubBranch,updateSubBranchStatus,getBranchList} = require('../controllers/user.controller');
 const { createGoldRate, getAllGoldRates, getGoldRateById, updateGoldRate, deleteGoldRate } = require("../controllers/goldrate.controller");
 const { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory } = require("../controllers/category.controller");
 const { getSubCategoryByCategory, createSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory , deleteSubCategory } = require("../controllers/subcategory.controller");
@@ -75,6 +75,10 @@ router.delete(
 router.put(
   '/update-subbranch-status/:id',
   updateSubBranchStatus
+);
+router.get(
+  '/get-branch-list',
+  getBranchList
 );
 
 

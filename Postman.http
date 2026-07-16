@@ -61,11 +61,10 @@ POST http://localhost:3001/api/login
 Content-Type: application/json
 
 {
-  "email": "admin@gmail.com",
-  "password": "admin123"
+  "email": "hitech@gmail.com",
+  "password": "hitech123"
 }
-
-
+ 
 
 ###
 POST http://localhost:3001/api/forgot-password
@@ -221,7 +220,7 @@ GET http://localhost:3001/api/getProductsByType/TRENDING
 Content-Type: application/json
 
 ###
-GET http://localhost:3001/api/get-product/6a1131a199ff7daa590ba97f
+GET http://localhost:3001/api/get-product/6a1e7141c2aad3cac853ace3
 Content-Type: application/json 
 
 ###
@@ -512,55 +511,70 @@ Content-Type: application/json
 
 
 ###
-POST http://localhost:3001/api/create-order
+POST http://localhost:3001/api/createOrder
 Content-Type: application/json
 
 {
-  "user": "6a32698734258cd3cea201d9",
+    "orderSource": "SUB_BRANCH",
 
-  "address": "69f65a7f98a8c5a25c60d668",
+    "branch": "6a3912d97c3f96315204b938",
 
-  "paymentMethod": "COD",
+    "subBranch": "6a3f9f101ad4a9c798bb8e32",
 
-  "subTotal": 84148.43,
+    "createdBy": "6a3f9f101ad4a9c798bb8e32",
 
-  "discountAmount": 0,
+    "customerDetails": {
+        "name": "kavya",
+        "phone": "8978971154",
+        "email": "anilkumar.a.001@gmai"
+    },
 
-  "shippingCharge": 0,
+    "paymentMethod": "CASH",
 
-  "gstAmount": 0,
+    "items": [
+        {
+            "product": "6a2e4ea3359ecc08bd7682ff",
+            "variant": "6a50921116374f0b6ba59172",
+            "quantity": 1
+        }
+    ],
 
-  "totalAmount": 84148.43,
+    "couponCode": "",
 
-  "notes": "Test Order",
-
-  "items": [
-    {
-      "product": "6a2e4af1359ecc08bd7680ce",
-
-      "variant": "6a2e4af1359ecc08bd7680cf",
-
-      "quantity": 1,
-
-      "unitPrice": 84148.43,
-
-      "totalPrice": 84148.43
-    }
-  ]
+    "notes": "Walk-in Customer"
 }
 
-
-
 ###
-GET  http://localhost:3001/api/get-all-orders
+GET http://localhost:3001/api/getOrdersByUser/69f6435c46e9fd840f071f61
 Content-Type: application/json
 
 ###
-GET  http://localhost:3001/api/get-order/6a2d0acb45de70dcb49519fb
+GET http://localhost:3001/api/getSubBranchOrders/6a3b56f3b5d4f12d8c8f111
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getBranchOrders/6a3912d97c3f96315204b938
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getAllOrders
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/getOrder/6a4765f80722367874acb415
+Content-Type: application/json
+
+
+###
+GET  http://localhost:3001/api/get-order/6a44b25ba18361b785cb4c3e
 Content-Type: application/json
 
 ###
 GET  http://localhost:3001/api/get-orders-by-user/6a32698734258cd3cea201d9
+Content-Type: application/json
+
+###
+DELETE http://localhost:3001/api/delete-order/6a48d1675eb185b5d68eeeaa
 Content-Type: application/json
 
 ###
@@ -598,3 +612,155 @@ Content-Type: application/json
 
 ###
 put http://localhost:3001/api/update-employee/6a3a933e3e273477e846fca3
+
+###
+POST http://localhost:3001/api/assign-product
+Content-Type: application/json
+
+{
+    "subBranchId": "6a3d869a0ae43f3b7496fdab",
+    "productId": "6a1e7141c2aad3cac853ace3",
+    "variantId": "6a2840cb6356e0c8900c9329",
+    "quantity": 5
+}
+
+###
+GET http://localhost:3001/api/assigned-products/6a3d869a0ae43f3b7496fdab
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-scheme
+Content-Type: application/json
+
+{
+    "name": "Gold Saving Scheme",
+    "amount": 60000,
+    "durationMonths": 12,
+    "userPayMonths": 11,
+    "companyPayMonths": 1,
+    "monthlyAmount": 5000,
+    "description": "Pay for 11 months and company pays the 12th month."
+}
+
+###
+GET http://localhost:3001/api/get-all-schemes
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-scheme/6a51e57a86a5b9c0b3f28111
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/update-scheme/6a51e57a86a5b9c0b3f28111
+Content-Type: application/json
+
+{
+    "name": "Diamond Saving Scheme",
+    "amount": 120000,
+    "durationMonths": 12,
+    "userPayMonths": 11,
+    "companyPayMonths": 1,
+    "monthlyAmount": 10000,
+    "description": "Updated scheme description."
+}
+
+###
+PUT http://localhost:3001/api/update-scheme-status/6a51e57a86a5b9c0b3f28111
+Content-Type: application/json
+
+{
+    "isActive": true
+}
+
+
+
+###
+DELETE http://localhost:3001/api/delete-scheme/6a51e57a86a5b9c0b3f28111
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-user-scheme
+Content-Type: application/json
+
+{
+    "user": "69f6435c46e9fd840f071f61",
+    "scheme": "6a5370d26ec81ea57e57c85b",
+    "schemeAmount": 60000,
+    "monthlyAmount": 5000,
+    "startDate": "2026-07-11",
+    "endDate": "2027-06-11",
+    "paidMonths": 0,
+    "status": "ACTIVE"
+}
+
+###
+GET http://localhost:3001/api/get-all-user-schemes
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-user-scheme/6a51f387654da03b06e9cfaf
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/update-user-scheme/6a51f387654da03b06e9cfaf
+Content-Type: application/json
+
+{
+    "schemeAmount": 72000,
+    "monthlyAmount": 6000,
+    "paidMonths": 4,
+    "status": "ACTIVE"
+}
+
+
+###
+PUT http://localhost:3001/api/update-user-scheme-status/6a51f387654da03b06e9cfaf
+Content-Type: application/json
+
+{
+  "status": "COMPLETED"
+}
+
+###
+DELETE http://localhost:3001/api/delete-user-scheme/6a51f387654da03b06e9cfaf
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-payment
+Content-Type: application/json
+
+{
+    "subscription": "6a51e57a86a5b9c0b3f28111",
+    "user": "6a2bf6dc9a89e91f73d21b1f",
+    "monthNo": 1,
+    "amount": 5000,
+    "paymentDate": "2026-07-11",
+    "paymentMode": "UPI",
+    "transactionId": "TXN100001",
+    "status": "PAID"
+}
+
+###
+GET http://localhost:3001/api/get-all-payments
+Content-Type: application/json
+
+###
+PUT http://localhost:3001/api/update-payment/6a51fa0bfcc22740fabdcff2
+Content-Type: application/json
+
+{
+    "monthNo": 2,
+    "amount": 6000,
+    "paymentDate": "2026-08-11",
+    "paymentMode": "CARD",
+    "transactionId": "TXN200001",
+    "status": "PAID"
+}
+
+###
+GET http://localhost:3001/api/get-payment/6a51fa0bfcc22740fabdcff2
+Content-Type: application/json
+
+###
+DELETE http://localhost:3001/api/delete-payment/6a51fde7a9d8e93eac4127a2
+Content-Type: application/json

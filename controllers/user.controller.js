@@ -109,8 +109,64 @@ exports.register = async (req, res) => {
 
 
 // LOGIN
+
+
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await Admin.findOne({ email });
+
+//     if (!user) {
+//       return res.status(404).json({
+//         message: 'User not found'
+//       });
+//     }
+
+//     const checkPassword = await bcrypt.compare(
+//       password,
+//       user.password
+//     );
+
+//     if (!checkPassword) {
+//       return res.status(400).json({
+//         message: 'Invalid password'
+//       });
+//     }
+
+//     const token = jwt.sign(
+//       {
+//         id: user._id,
+//         role: user.role,
+//           branchId: user.branchId
+//       },
+//       process.env.JWT_SECRET,
+//       {
+//         expiresIn: '1d'
+//       }
+//     );
+
+//     res.status(200).json({
+//       message: 'Login Success',
+//       token,
+//         _id: user._id, 
+//       role: user.role,
+//        name: user.name,
+//   email: user.email,
+//       permissions: user.permissions
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({
+//       message: error.message
+//     });
+//   }
+// };
+
+// LOGIN
 exports.login = async (req, res) => {
   try {
+
     const { email, password } = req.body;
 
     const user = await Admin.findOne({ email });
@@ -132,10 +188,28 @@ exports.login = async (req, res) => {
       });
     }
 
+    // ==========================
+    // ADD THIS BLOCK HERE
+    // ==========================
+
+    if (
+      user.role === "SUB_BRANCH" &&
+      user.status === "INACTIVE"
+    ) {
+      return res.status(403).json({
+        message: "Your account is inactive. Please contact Branch Admin."
+      });
+    }
+
+    // ==========================
+    // JWT TOKEN
+    // ==========================
+
     const token = jwt.sign(
       {
         id: user._id,
-        role: user.role
+        role: user.role,
+        branchId: user.branchId
       },
       process.env.JWT_SECRET,
       {
@@ -146,16 +220,19 @@ exports.login = async (req, res) => {
     res.status(200).json({
       message: 'Login Success',
       token,
+      _id: user._id,
       role: user.role,
-       name: user.name,
-  email: user.email,
+      name: user.name,
+      email: user.email,
       permissions: user.permissions
     });
 
   } catch (error) {
+
     res.status(500).json({
       message: error.message
     });
+
   }
 };
 
@@ -460,63 +537,56 @@ exports.deleteSubBranch = async (req, res) => {
 
 };
 
-exports.updateSubBranchStatus = async (req, res) => {
 
+
+exports.updateSubBranchStatus = async (req, res) => {
   try {
 
     const { id } = req.params;
-
     const { status } = req.body;
 
-    const subBranch =
-      await Admin.findByIdAndUpdate(
-
-        id,
-
-        {
-          status
-        },
-
-        {
-          new: true
-        }
-
-      );
-
-    if (!subBranch) {
-
-      return res.status(404).json({
-
-        message: 'Sub Branch Not Found'
-
+    if (!["ACTIVE", "INACTIVE"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Status"
       });
-
     }
 
-    res.status(200).json({
+    const subBranch = await Admin.findById(id);
 
+    if (!subBranch) {
+      return res.status(404).json({
+        success: false,
+        message: "Sub Branch not found"
+      });
+    }
+
+    // BRANCH status change cheyyakudadhu
+    if (subBranch.role !== "SUB_BRANCH") {
+      return res.status(400).json({
+        success: false,
+        message: "Only Sub Branch status can be updated"
+      });
+    }
+
+    subBranch.status = status;
+
+    await subBranch.save();
+
+    return res.status(200).json({
       success: true,
-
-      message: 'Status Updated Successfully',
-
+      message: `Sub Branch ${status} Successfully`,
       data: subBranch
-
     });
 
-  }
+  } catch (error) {
 
-  catch (error) {
-
-    res.status(500).json({
-
+    return res.status(500).json({
       success: false,
-
       message: error.message
-
     });
 
   }
-
 };
 
 

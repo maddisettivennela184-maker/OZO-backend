@@ -31,8 +31,30 @@ async (
     mailOptions
   );
 };
+const sendInvoiceEmail = async (
+    email,
+    subject,
+    html
+) => {
+
+    const mailOptions = {
+
+        from: "maddisettivennela@gmail.com",
+
+        to: email,
+
+        subject,
+
+        html
+
+    };
+
+    return await transporter.sendMail(mailOptions);
+
+};
 
 module.exports = {
   transporter,
-  sendEmail
+  sendEmail,
+  sendInvoiceEmail
 };

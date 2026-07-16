@@ -2,278 +2,286 @@ const mongoose = require("mongoose");
 
 const orderItemSchema = new mongoose.Schema({
 
-  // ======================
-  // PRODUCT REFERENCE
-  // ======================
+    product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
 
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true
-  },
+    variant: { type: mongoose.Schema.Types.ObjectId, required: true },
 
-  variant: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
-
-  // ======================
-  // PRODUCT SNAPSHOT
-  // ======================
-
-  productSnapshot: {
-
-    name: {
-      type: String,
-      required: true
+    productSnapshot: {
+        name: { type: String, required: true },
+        slug: String,
+        image: String,
+        category: String,
+        subCategory: String,
+        subSubCategory: String,
+        productType: String,
+        brand: String
     },
 
-    slug: String,
+    variantSnapshot: {
+        sku: String,
+        metalType: String,
+        purity: String,
+        metalColor: String,
+        size: String,
+        grossWeight: Number,
+        netWeight: Number,
+        wastagePercentage: Number,
+        stoneWeight: Number,
+        diamondWeight: Number,
+        makingCharge: Number,
+        makingChargeType: String,
+        discountPercentage: Number,
+        stoneType: String,
+        gender: String,
+        // ADD THIS
+    stones: [{
+        stoneType: String,
+        stoneCategory: String,
+        quality: String,
+        quantity: Number,
+        totalWeight: Number,
+        stoneValue: Number
+    }]
+    },
 
-    image: String,
+    pricingSnapshot: {
+        goldRate: Number,
+        goldValue: Number,
+        wastageAmount: Number,
+        stoneValue: Number,
+        diamondValue: Number,
+        makingCharge: Number,
+        discountAmount: Number,
+        gstPercentage: Number,
+        gstAmount: Number,
+        finalPrice: Number
+    },
 
-    category: String,
+    quantity: { type: Number, default: 1 },
 
-    subCategory: String
+    unitPrice: { type: Number, required: true },
 
-  },
+    totalPrice: { type: Number, required: true }
 
-  // ======================
-  // VARIANT SNAPSHOT
-  // ======================
-
-  variantSnapshot: {
-
-    sku: String,
-
-    purity: String,
-
-    size: String,
-
-    grossWeight: Number,
-
-    netWeight: Number,
-
-    stoneWeight: Number,
-
-    diamondWeight: Number,
-
-    makingCharge: Number,
-
-    stoneType: String,
-
-    gender: String
-
-  },
-
-  // ======================
-  // PRICE SNAPSHOT
-  // ======================
-
-  pricingSnapshot: {
-
-    goldRate: Number,
-
-    goldValue: Number,
-
-    diamondValue: Number,
-
-    stoneValue: Number,
-
-    makingCharge: Number,
-
-    gstAmount: Number
-
-  },
-
-  quantity: {
-    type: Number,
-    default: 1
-  },
-
-  unitPrice: {
-    type: Number,
-    required: true
-  },
-
-  totalPrice: {
-    type: Number,
-    required: true
-  }
-
-}, {
-  _id: false
 });
 
 const orderSchema = new mongoose.Schema({
 
-  // ======================
-  // ORDER DETAILS
-  // ======================
+    // =====================
+    // ORDER
+    // =====================
 
-  orderNumber: {
-    type: String,
-    unique: true,
-    required: true
-  },
+    orderNumber: { type: String, unique: true, required: true },
 
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
+    invoiceNumber: { type: String, unique: true },
 
-  items: {
-    type: [orderItemSchema],
-    required: true
-  },
+    orderSource: {
+        type: String,
+        enum: ["ONLINE", "BRANCH", "SUB_BRANCH"],
+        required: true
+    },
 
-  // ======================
-  // SHIPPING ADDRESS
-  // ======================
+    // =====================
+    // BRANCH
+    // =====================
 
-  address: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Address",
-    required: true
-  },
+    branch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Admin",
+        default: null
+    },
 
-  addressSnapshot: {
+    subBranch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Admin",
+        default: null
+    },
 
-    fullName: String,
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Admin",
+        default: null
+    },
 
-    phone: String,
+    // =====================
+    // CUSTOMER
+    // =====================
 
-    alternatePhone: String,
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    },
 
-    addressLine1: String,
+    customerDetails: {
+        name: String,
+        phone: String,
+        email: String
+    },
 
-    addressLine2: String,
+    // =====================
+    // ITEMS
+    // =====================
 
-    landmark: String,
+    items: {
+        type: [orderItemSchema],
+        required: true
+    },
 
-    city: String,
+    // =====================
+    // ADDRESS
+    // =====================
 
-    state: String,
+    address: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Address",
+        default: null
+    },
 
-    country: String,
+    addressSnapshot: {
+        fullName: String,
+        phone: String,
+        alternatePhone: String,
+        addressLine1: String,
+        addressLine2: String,
+        landmark: String,
+        city: String,
+        state: String,
+        country: String,
+        postalCode: String
+    },
 
-    postalCode: String
+    // =====================
+    // PAYMENT
+    // =====================
 
-  },
+    paymentMethod: {
+        type: String,
+        enum: ["CASH", "UPI", "CARD", "NETBANKING", "ONLINE", "COD", "SPLIT"],
+        required: true
+    },
 
-  // ======================
-  // PAYMENT
-  // ======================
+    paymentStatus: {
+        type: String,
+        enum: ["Pending", "Paid", "Failed", "Refunded"],
+        default: "Pending"
+    },
 
-  paymentMethod: {
-    type: String,
-    enum: [
-      "COD",
-      "ONLINE",
-      "UPI",
-      "CARD",
-      "NETBANKING"
-    ],
-    required: true
-  },
+    paymentHistory: [{
+        method: {
+            type: String,
+            enum: ["CASH", "UPI", "CARD", "NETBANKING", "ONLINE"]
+        },
+        amount: Number,
+        transactionId: String,
+        paymentGateway: String,
+        paidAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
 
-  paymentStatus: {
-    type: String,
-    enum: [
-      "Pending",
-      "Paid",
-      "Failed",
-      "Refunded"
-    ],
-    default: "Pending"
-  },
+    // =====================
+    // PRICE
+    // =====================
 
-  transactionId: String,
+    subTotal: { type: Number, required: true },
 
-  paymentGateway: String,
+    discountAmount: { type: Number, default: 0 },
 
-  paidAt: Date,
+    couponCode: String,
 
-  // ======================
-  // PRICE SUMMARY
-  // ======================
+    shippingCharge: { type: Number, default: 0 },
 
-  subTotal: {
-    type: Number,
-    required: true
-  },
+    gstAmount: { type: Number, default: 0 },
 
-  discountAmount: {
-    type: Number,
-    default: 0
-  },
+    totalAmount: { type: Number, required: true },
 
-  couponCode: String,
+    // =====================
+    // STATUS
+    // =====================
 
-  shippingCharge: {
-    type: Number,
-    default: 0
-  },
+    orderStatus: {
+        type: String,
+        enum: [
+            "Pending",
+            "Confirmed",
+            "Processing",
+            "Packed",
+            "Shipped",
+            "Out For Delivery",
+            "Delivered",
+            "Cancelled",
+            "Completed", 
+            "Returned",
+            "Refunded"
+        ],
+        default: "Pending"
+    },
 
-  gstAmount: {
-    type: Number,
-    default: 0
-  },
+    billingStatus: {
+        type: String,
+        enum: ["Draft", "Completed", "Cancelled"],
+        default: "Completed"
+    },
 
-  totalAmount: {
-    type: Number,
-    required: true
-  },
+    statusHistory: [{
+        status: String,
+        updatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Admin"
+        },
+        remarks: String,
+        updatedAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
 
-  // ======================
-  // ORDER STATUS
-  // ======================
+    // =====================
+    // DELIVERY
+    // =====================
 
-  orderStatus: {
-    type: String,
-    enum: [
-      "Pending",
-      "Confirmed",
-      "Processing",
-      "Packed",
-      "Shipped",
-      "Out For Delivery",
-      "Delivered",
-      "Cancelled",
-      "Returned",
-      "Refunded"
-    ],
-    default: "Pending"
-  },
+    trackingNumber: String,
 
-  // ======================
-  // TRACKING
-  // ======================
+    courierPartner: String,
 
-  trackingNumber: String,
+    shippedAt: Date,
 
-  courierPartner: String,
+    deliveredAt: Date,
 
-  shippedAt: Date,
+    expectedDeliveryDate: Date,
 
-  deliveredAt: Date,
+    // =====================
+    // BILLING
+    // =====================
 
-  expectedDeliveryDate: Date,
+    invoicePrinted: {
+        type: Boolean,
+        default: false
+    },
 
-  cancelReason: String,
+    invoiceDate: Date,
 
-  returnReason: String,
+    stockUpdated: {
+        type: Boolean,
+        default: false
+    },
 
-  notes: String
+    // =====================
+    // OTHER
+    // =====================
+
+    cancelReason: String,
+
+    returnReason: String,
+
+    notes: String
 
 }, {
-  timestamps: true
+    timestamps: true
 });
 
 module.exports =
-  mongoose.models.Order ||
-  mongoose.model(
-    "Order",
-    orderSchema
-  );
+    mongoose.models.Order ||
+    mongoose.model("Order", orderSchema);

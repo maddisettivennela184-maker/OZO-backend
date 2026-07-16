@@ -6,12 +6,12 @@ const router = express.Router();
 
 
 
-const { register, login, forgotPassword, resetPassword,getAllSubBranches,updateSubBranch,getSubBranchById,deleteSubBranch,updateSubBranchStatus,getBranchList} = require('../controllers/user.controller');
+const { register, login, forgotPassword, resetPassword, getAllSubBranches, updateSubBranch, getSubBranchById, deleteSubBranch, getBranchList, updateSubBranchStatus } = require('../controllers/user.controller');
 const { createGoldRate, getAllGoldRates, getGoldRateById, updateGoldRate, deleteGoldRate } = require("../controllers/goldrate.controller");
 const { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory } = require("../controllers/category.controller");
-const { getSubCategoryByCategory, createSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory , deleteSubCategory } = require("../controllers/subcategory.controller");
+const { getSubCategoryByCategory, createSubCategory, getAllSubCategories, getSubCategoryById, updateSubCategory, deleteSubCategory } = require("../controllers/subcategory.controller");
 const { getSubSubCategoryBySubCategory, createSubSubCategory, getAllSubSubCategories, getSubSubCategoryById, updateSubSubCategory, deleteSubSubCategory } = require("../controllers/subsubcategory.controller");
-const { createProduct, getAllProducts, getAllProductsWithPagination, getProductsByType, getProductById, updateProduct, deleteProduct, getProductsByCategory, getProductsByCategoryId } = require("../controllers/product.controller");
+const { createProduct, getAllProducts, getAllProductsWithPagination, getProductsByType, getProductById, updateProduct, deleteProduct, getProductsByCategory, getProductsByCategoryId, changeProductStatus } = require("../controllers/product.controller");
 const { getAllUsers, getUsersCount, getProfileSummary, userLogout, Userregister, userLogin, userforgotPassword, verifyOTP, resendOTP, userresetPassword } = require("../controllers/userlogin.controller");
 const { addToCart, getCart, updateCartItem, removeCartItem, clearCart } = require("../controllers/cart.controller");
 const { addToWishlist, getWishlist, removeWishlistItem } = require("../controllers/wishlist.controller");
@@ -22,29 +22,24 @@ const { createCoupon, getAllCoupons, getCouponById, updateCoupon, deleteCoupon }
 const { createReview, getAllReviews, getReviewById, getProductReviews, updateReview, deleteReview } = require("../controllers/review.controller");
 const { createMetalRate, getAllMetalRates, getMetalRateById, updateMetalRate, deleteMetalRate, toggleMetalRateStatus } = require("../controllers/metal-rate.controller");
 const { createStoneRate, getAllStoneRates, getStoneRateById, updateStoneRate, deleteStoneRate, toggleStoneRateStatus } = require("../controllers/stone-rate.controller");
-const {createOrder,getAllOrders,getOrderById,getOrdersByUser,updateOrderStatus,updatePaymentStatus,cancelOrder,deleteOrder} = require("../controllers/order.controller");
+const { calculatePrice, deleteOrder, createOrder, getAllOrders, getOrderById, getOrdersByUser, getBranchOrders, getSubBranchOrders } = require("../controllers/order.controller");
 
 const { createSizeChart, getAllSizeCharts, getSizeChartBySubCategory, updateSizeChart, deleteSizeChart } = require("../controllers/size-chart.controller");
-const {createAds,getAllAds,getAdsById,updateSection,deleteAds,updateAdsStatus} = require("../controllers/adss.controller");
-const {
-createEmployee,
+const { createAds, getAllAds, getAdsById, updateSection, deleteAds, updateAdsStatus } = require("../controllers/adss.controller");
+const { createEmployee, getAllEmployees, getEmployeeById, updateEmployee, updateEmployeeStatus, deleteEmployee, getEmployeesByBranch } = require('../controllers/employee.controller');
+const { assignProductToSubBranch, getAssignedProducts, returnAssignedProduct, assignMultipleProducts, getAssignedProductsBySubBranch } = require("../controllers/assignProduct-subbranch");
+const { createScheme, getAllSchemes, getSchemeById, updateScheme, deleteScheme, updateSchemeStatus } = require("../controllers/scheme.controller");
+const { createUserScheme, getAllUserSchemes, getUserSchemeByUserId, updateUserScheme, deleteUserScheme, getUserSchemeById } = require("../controllers/userscheme.controller");
+const { createPayment, getAllPayments, getPaymentById, updatePayment, deletePayment, getUserPayments, getPaymentHistory } = require("../controllers/schema-payment.controller");
 
-  getAllEmployees,
+// const router = express.Router();
 
-  getEmployeeById,
 
-  updateEmployee,
-
-  updateEmployeeStatus,
-
-  deleteEmployee
-
-} = require(
-  '../controllers/employee.controller'
-);
 const upload = require("../middleware/upload");
+const { verifyToken } = require("../middleware/auth");
 
 const { uploadCertificate } = require("../controllers/upload.controller");
+
 
 
 router.post("/create-contact", createContact);
@@ -59,10 +54,14 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
-router.get('/get-all-subbranches',getAllSubBranches);
+router.get('/get-all-subbranches', getAllSubBranches);
 router.put(
   '/update-subbranch/:id',
   updateSubBranch
+);
+router.put(
+  "/update-subbranch-status/:id",
+  updateSubBranchStatus
 );
 router.get(
   '/getSubBranchById/:id',
@@ -72,10 +71,7 @@ router.delete(
   '/delete-subbranch/:id',
   deleteSubBranch
 );
-router.put(
-  '/update-subbranch-status/:id',
-  updateSubBranchStatus
-);
+
 router.get(
   '/get-branch-list',
   getBranchList
@@ -99,7 +95,7 @@ router.delete("/deletecategory/:id", deleteCategory);
 router.post("/Cretesubcategory", upload.single("image"), createSubCategory);
 router.get("/getbyIdsubcategory/:id", getSubCategoryById);
 router.get("/Getsubcategory", getAllSubCategories);
-router.put("/Updatesubcategory/:id", upload.single("image"),updateSubCategory);
+router.put("/Updatesubcategory/:id", upload.single("image"), updateSubCategory);
 router.delete("/Deletesubcategory/:id", deleteSubCategory);
 router.get("/get-subcategoryby-category/:categoryId", getSubCategoryByCategory);
 
@@ -121,6 +117,7 @@ router.get("/get-product/:id", getProductById);
 router.delete("/Deleteproduct/:id", deleteProduct);
 router.get("/getProductsByCategory", getProductsByCategory);
 router.get('/getCategoryIdByProducts/:categoryId', getProductsByCategoryId);
+router.patch("/product/status/:id", changeProductStatus);
 
 router.post("/upload-certificate", upload.single("file"), uploadCertificate);
 
@@ -212,16 +209,19 @@ router.get("/get-size-chart-by-sub-category/:subCategoryId", getSizeChartBySubCa
 router.put("/update-size-chart/:id", upload.single("image"), updateSizeChart);
 router.delete("/delete-size-chart/:id", deleteSizeChart);
 
-router.post("/create-order",createOrder);
-router.get("/get-all-orders",getAllOrders);
-router.get("/get-order/:id",getOrderById);
-router.get("/get-orders-by-user/:userId",getOrdersByUser);
-router.put("/update-order-status/:id",updateOrderStatus);
-router.put("/update-payment-status/:id",updatePaymentStatus);
-router.put("/cancel-order/:id",cancelOrder);
-router.delete("/delete-order/:id",deleteOrder);
+router.post("/createOrder", createOrder);
+router.get("/getAllOrders", getAllOrders);
+// router.get("/getOrder/:id", getOrderById);
+router.get("/getOrdersByUser/:userId", getOrdersByUser);
+router.get("/getBranchOrders/:branchId", getBranchOrders);
+router.get("/getSubBranchOrders/:subBranchId", getSubBranchOrders);
+router.post("/calculatePrice", calculatePrice);
+router.delete(
+  "/delete-order/:id",
+  deleteOrder
+);
 
-// router.post( "/create-ads", createAds);
+router.post("/create-ads", createAds);
 router.post(
   "/createAds",
   upload.fields([
@@ -229,16 +229,16 @@ router.post(
     { name: "section2Images", maxCount: 1 },
     { name: "section3Images", maxCount: 1 }
   ]),
- createAds
+  createAds
 );
-router.get("/get-all-ads",getAllAds);
-router.get("/get-ads/:id",getAdsById);
+router.get("/get-all-ads", getAllAds);
+router.get("/get-ads/:id", getAdsById);
 router.put(
   "/updateSection/:id",
   upload.single("image"),
   updateSection
 );
-router.delete("/delete-ads/:id",deleteAds);
+router.delete("/delete-ads/:id", deleteAds);
 router.put(
   "/updateAdsStatus/:id",
   updateAdsStatus
@@ -249,22 +249,27 @@ router.put(
 
 router.post(
 
-  '/create-employee',
+  "/create-employee",
 
   upload.fields([
 
     {
-      name: 'photo',
+
+      name: "photo",
+
       maxCount: 1
+
     },
 
     {
-      name: 'aadhaarImage',
+
+      name: "aadhaarImage",
+
       maxCount: 1
+
     }
 
   ]),
-
   createEmployee
 
 );
@@ -280,26 +285,101 @@ router.get(
   getEmployeeById
 );
 
+router.get(
+  "/branch-employees",
+  verifyToken,
+  getEmployeesByBranch
+);
+
 router.put(
 
-  '/update-employee/:id',
+  "/update-employee/:id",
 
   upload.fields([
+
     {
-      name: 'photo',
+
+      name: "photo",
+
       maxCount: 1
+
     },
+
     {
-      name: 'aadhaarImage',
+
+      name: "aadhaarImage",
+
       maxCount: 1
+
     }
+
   ]),
 
   updateEmployee
+
+);
+router.post(
+  "/create-employee",
+  verifyToken,
+  createEmployee
 );
 
 router.delete(
   '/delete-employee/:id',
   deleteEmployee
 );
+
+router.post(
+  "/assign-product",
+  verifyToken,
+  assignProductToSubBranch
+);
+router.get(
+  "/assigned-products",
+  verifyToken,
+  getAssignedProducts
+);
+// router.get("/assigned-products/:subBranchId", getAssignedProducts);
+router.post("/return-product", returnAssignedProduct);
+router.post(
+  "/assign-multiple-products",
+  verifyToken,
+  assignMultipleProducts
+);
+router.get(
+  "/getassigned-products/:subBranchId",
+  verifyToken,
+  getAssignedProductsBySubBranch
+);
+router.get(
+  "/my-assigned-products",
+  verifyToken,
+  getAssignedProductsBySubBranch
+);
+
+// sceams 
+// Create
+router.post("/create-scheme", createScheme);
+router.get("/get-all-schemes", getAllSchemes);
+router.get("/get-scheme/:id", getSchemeById);
+router.put("/update-scheme/:id", updateScheme);
+router.put("/update-scheme-status/:id", updateSchemeStatus);
+router.delete("/delete-scheme/:id", deleteScheme);
+
+// userschem-scheema
+router.post("/create-user-scheme", createUserScheme);
+router.get("/get-all-user-schemes", getAllUserSchemes);
+router.get("/get-user-scheme/:userId", getUserSchemeByUserId);
+router.put("/update-user-scheme/:id", updateUserScheme);
+router.delete("/delete-user-scheme/:id", deleteUserScheme);
+router.get("/get-user-scheme/:userId/:userSchemeId", getUserSchemeById);
+
+router.post("/create-payment", createPayment);
+router.get("/get-all-payments", getAllPayments);
+router.get("/get-payment/:id", getPaymentById);
+router.put("/update-payment/:id", updatePayment);
+router.delete("/delete-payment/:id", deletePayment);
+router.get("/get-user-payments/:userId", getUserPayments);
+router.get("/get-payment-history/:subscriptionId", getPaymentHistory);
+
 module.exports = router;

@@ -2478,6 +2478,42 @@ exports.getProductsByCategory = async (req, res) => {
 
 };
 
+// =========================status
+exports.changeProductStatus = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    const { isActive } = req.body;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
+    product.isActive = isActive;
+
+    await product.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Product ${isActive ? "Activated" : "Inactivated"} Successfully`,
+      data: product
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};
+
 // exports.getProductsByType = async (
 //   req,
 //   res

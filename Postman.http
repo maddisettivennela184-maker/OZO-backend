@@ -117,7 +117,12 @@ DELETE http://localhost:3001/api/gold-rate/69f0ef51d271df42b36bf108
 Content-Type: application/json
 
 ###
-POST http://localhost:3001/api/create-category
+POST http://localhost:3001/api/create-category     
+
+###
+GET http://localhost:3001/api/total-orders
+Content-Type: application/json
+
 
 ###
 GET http://localhost:3001/api/getallcategory
@@ -724,6 +729,18 @@ Content-Type: application/json
 ###
 DELETE http://localhost:3001/api/delete-user-scheme/6a51f387654da03b06e9cfaf
 Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-all-size-charts
+Content-Type: application/json
+
+###
+GET http://localhost:3001/api/get-size-chart/6a663c6520db0cfdcd48c491
+Content-Type: application/json
+
+###
+POST http://localhost:3001/api/create-size-chart
+
 
 ###
 POST http://localhost:3001/api/create-payment

@@ -300,21 +300,38 @@ exports.createPayment = async (req, res) => {
 // ===============================
 // Get All Payments
 // ===============================
+// ===============================
+// Get All Payments
+// ===============================
 exports.getAllPayments = async (req, res) => {
     try {
 
-        const payments = await Payment.find();
+        const payments = await Payment.find()
+            .populate({
+                path: "user",
+                select: "name email phone"
+            })
+            .populate({
+                path: "subscription",
+                select: "schemeName monthlyAmount"
+            })
+            .sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
+            count: payments.length,
             data: payments
         });
 
     } catch (error) {
+
+        console.log(error);
+
         res.status(500).json({
             success: false,
             message: error.message
         });
+
     }
 };
 
@@ -674,7 +691,8 @@ exports.getPaymentHistory = async (req, res) => {
 
                 .populate({
 
-                    path: "scheme"
+                    path: "scheme",
+                     select: "name amount monthlyAmount"
 
                 })
 

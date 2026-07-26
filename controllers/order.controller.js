@@ -993,7 +993,38 @@ This is a system generated invoice.
 
 
 
+// ==========================
+// Total Orders Count
+// ==========================
+exports.getTotalOrders = async (req, res) => {
 
+    try {
+
+        const totalOrders = await Order.countDocuments();
+
+        res.status(200).json({
+
+            success: true,
+
+            totalOrders
+
+        });
+
+    }
+
+    catch (error) {
+
+        res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
 exports.getAllOrders = async (req, res) => {
     try {
 

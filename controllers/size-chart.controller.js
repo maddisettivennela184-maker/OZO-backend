@@ -79,6 +79,37 @@ exports.createSizeChart = async (req, res) => {
     }
 
 };
+exports.getSizeChartById = async (req, res) => {
+
+    try {
+
+        const sizeChart = await SizeChart.findById(req.params.id)
+            .populate("subCategory", "name");
+
+        if (!sizeChart) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Size chart not found"
+            });
+
+        }
+
+        res.status(200).json({
+            success: true,
+            data: sizeChart
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
 exports.getAllSizeCharts = async (req, res) => {
 
     try {

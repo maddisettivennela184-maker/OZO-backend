@@ -22,9 +22,9 @@ const { createCoupon, getAllCoupons, getCouponById, updateCoupon, deleteCoupon }
 const { createReview, getAllReviews, getReviewById, getProductReviews, updateReview, deleteReview } = require("../controllers/review.controller");
 const { createMetalRate, getAllMetalRates, getMetalRateById, updateMetalRate, deleteMetalRate, toggleMetalRateStatus } = require("../controllers/metal-rate.controller");
 const { createStoneRate, getAllStoneRates, getStoneRateById, updateStoneRate, deleteStoneRate, toggleStoneRateStatus } = require("../controllers/stone-rate.controller");
-const { calculatePrice, deleteOrder, createOrder, getAllOrders, getOrderById, getOrdersByUser, getBranchOrders, getSubBranchOrders } = require("../controllers/order.controller");
+const { getTotalOrders,calculatePrice, deleteOrder, createOrder, getAllOrders, getOrderById, getOrdersByUser, getBranchOrders, getSubBranchOrders } = require("../controllers/order.controller");
 
-const { createSizeChart, getAllSizeCharts, getSizeChartBySubCategory, updateSizeChart, deleteSizeChart } = require("../controllers/size-chart.controller");
+const { createSizeChart, getAllSizeCharts, getSizeChartBySubCategory, updateSizeChart, deleteSizeChart,getSizeChartById } = require("../controllers/size-chart.controller");
 const { createAds, getAllAds, getAdsById, updateSection, deleteAds, updateAdsStatus } = require("../controllers/adss.controller");
 const { createEmployee, getAllEmployees, getEmployeeById, updateEmployee, updateEmployeeStatus, deleteEmployee, getEmployeesByBranch } = require('../controllers/employee.controller');
 const { assignProductToSubBranch, getAssignedProducts, returnAssignedProduct, assignMultipleProducts, getAssignedProductsBySubBranch } = require("../controllers/assignProduct-subbranch");
@@ -208,6 +208,7 @@ router.get("/get-all-size-charts", getAllSizeCharts);
 router.get("/get-size-chart-by-sub-category/:subCategoryId", getSizeChartBySubCategory);
 router.put("/update-size-chart/:id", upload.single("image"), updateSizeChart);
 router.delete("/delete-size-chart/:id", deleteSizeChart);
+router.get("/get-size-chart/:id", getSizeChartById);
 
 router.post("/createOrder", createOrder);
 router.get("/getAllOrders", getAllOrders);
@@ -216,6 +217,7 @@ router.get("/getOrdersByUser/:userId", getOrdersByUser);
 router.get("/getBranchOrders/:branchId", getBranchOrders);
 router.get("/getSubBranchOrders/:subBranchId", getSubBranchOrders);
 router.post("/calculatePrice", calculatePrice);
+router.get("/total-orders", getTotalOrders);
 router.delete(
   "/delete-order/:id",
   deleteOrder
